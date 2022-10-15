@@ -1,0 +1,22 @@
+[package]
+name = "mango-v3-reimbursement"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "mango_v3_reimbursement"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { path = "../../../mango-v4/anchor/lang" }
+anchor-spl = { path = "../../../mango-v4/anchor/spl" }
+solana-program = "~1.10.29"
+static_assertions = "1.1"
