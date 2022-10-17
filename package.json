@@ -1,5 +1,9 @@
 {
+  "name": "mango_v3_reimbursement_lib",
+  "license": "MIT",
+  "version": "1.0.0",
   "scripts": {
+    "build": "tsc",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
   },
