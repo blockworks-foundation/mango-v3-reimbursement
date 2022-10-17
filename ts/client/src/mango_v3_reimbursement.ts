@@ -8,7 +8,21 @@ export type MangoV3Reimbursement = {
         {
           "name": "group",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Group"
+              },
+              {
+                "kind": "arg",
+                "type": "u32",
+                "path": "group_num"
+              }
+            ]
+          }
         },
         {
           "name": "payer",
@@ -46,7 +60,7 @@ export type MangoV3Reimbursement = {
           "type": "publicKey"
         },
         {
-          "name": "claimTransferDestinationAtasOwner",
+          "name": "claimTransferDestination",
           "type": "publicKey"
         }
       ]
@@ -62,12 +76,50 @@ export type MangoV3Reimbursement = {
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Vault"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "arg",
+                "type": "u64",
+                "path": "token_index"
+              }
+            ]
+          }
         },
         {
           "name": "claimMint",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "arg",
+                "type": "u64",
+                "path": "token_index"
+              }
+            ]
+          }
         },
         {
           "name": "mint",
@@ -98,9 +150,7 @@ export type MangoV3Reimbursement = {
       "args": [
         {
           "name": "tokenIndex",
-          "type": {
-            "defined": "usize"
-          }
+          "type": "u64"
         },
         {
           "name": "mintDecimals",
@@ -119,7 +169,26 @@ export type MangoV3Reimbursement = {
         {
           "name": "reimbursementAccount",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "ReimbursementAccount"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mango_account_owner"
+              }
+            ]
+          }
         },
         {
           "name": "mangoAccountOwner",
@@ -182,94 +251,6 @@ export type MangoV3Reimbursement = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "reimburse",
-      "accounts": [
-        {
-          "name": "group",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "reimbursementAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mangoAccountOwner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "claimMintTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "claimMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "table",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "indexIntoTable",
-          "type": {
-            "defined": "usize"
-          }
-        },
-        {
-          "name": "tokenIndex",
-          "type": {
-            "defined": "usize"
-          }
-        },
-        {
-          "name": "transferClaim",
-          "type": "bool"
-        }
-      ]
     }
   ],
   "accounts": [
@@ -287,7 +268,7 @@ export type MangoV3Reimbursement = {
             "type": "publicKey"
           },
           {
-            "name": "claimTransferDestinationAtasOwner",
+            "name": "claimTransferDestination",
             "type": "publicKey"
           },
           {
@@ -338,46 +319,6 @@ export type MangoV3Reimbursement = {
       }
     },
     {
-      "name": "table",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rows",
-            "type": {
-              "array": [
-                {
-                  "defined": "Row"
-                },
-                32000
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "row",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "balances",
-            "type": {
-              "array": [
-                "u64",
-                16
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "reimbursementAccount",
       "type": {
         "kind": "struct",
@@ -403,10 +344,45 @@ export type MangoV3Reimbursement = {
       }
     },
     {
-      "name": "mangoAccountReimbursementState",
+      "name": "table",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "rows",
+            "type": {
+              "array": [
+                {
+                  "defined": "Row"
+                },
+                32000
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Row",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "balances",
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
+          }
+        ]
       }
     }
   ],
@@ -428,7 +404,21 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "group",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Group"
+              },
+              {
+                "kind": "arg",
+                "type": "u32",
+                "path": "group_num"
+              }
+            ]
+          }
         },
         {
           "name": "payer",
@@ -466,7 +456,7 @@ export const IDL: MangoV3Reimbursement = {
           "type": "publicKey"
         },
         {
-          "name": "claimTransferDestinationAtasOwner",
+          "name": "claimTransferDestination",
           "type": "publicKey"
         }
       ]
@@ -482,12 +472,50 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Vault"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "arg",
+                "type": "u64",
+                "path": "token_index"
+              }
+            ]
+          }
         },
         {
           "name": "claimMint",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "Mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "arg",
+                "type": "u64",
+                "path": "token_index"
+              }
+            ]
+          }
         },
         {
           "name": "mint",
@@ -518,9 +546,7 @@ export const IDL: MangoV3Reimbursement = {
       "args": [
         {
           "name": "tokenIndex",
-          "type": {
-            "defined": "usize"
-          }
+          "type": "u64"
         },
         {
           "name": "mintDecimals",
@@ -539,7 +565,26 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "reimbursementAccount",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "ReimbursementAccount"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mango_account_owner"
+              }
+            ]
+          }
         },
         {
           "name": "mangoAccountOwner",
@@ -602,94 +647,6 @@ export const IDL: MangoV3Reimbursement = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "reimburse",
-      "accounts": [
-        {
-          "name": "group",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "reimbursementAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mangoAccountOwner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "claimMintTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "claimMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "table",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "indexIntoTable",
-          "type": {
-            "defined": "usize"
-          }
-        },
-        {
-          "name": "tokenIndex",
-          "type": {
-            "defined": "usize"
-          }
-        },
-        {
-          "name": "transferClaim",
-          "type": "bool"
-        }
-      ]
     }
   ],
   "accounts": [
@@ -707,7 +664,7 @@ export const IDL: MangoV3Reimbursement = {
             "type": "publicKey"
           },
           {
-            "name": "claimTransferDestinationAtasOwner",
+            "name": "claimTransferDestination",
             "type": "publicKey"
           },
           {
@@ -758,46 +715,6 @@ export const IDL: MangoV3Reimbursement = {
       }
     },
     {
-      "name": "table",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rows",
-            "type": {
-              "array": [
-                {
-                  "defined": "Row"
-                },
-                32000
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "row",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "balances",
-            "type": {
-              "array": [
-                "u64",
-                16
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "reimbursementAccount",
       "type": {
         "kind": "struct",
@@ -823,10 +740,45 @@ export const IDL: MangoV3Reimbursement = {
       }
     },
     {
-      "name": "mangoAccountReimbursementState",
+      "name": "table",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "rows",
+            "type": {
+              "array": [
+                {
+                  "defined": "Row"
+                },
+                32000
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Row",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "balances",
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
+          }
+        ]
       }
     }
   ],

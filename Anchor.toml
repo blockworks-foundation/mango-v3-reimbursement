@@ -1,6 +1,7 @@
 [features]
-seeds = false
+seeds = true
 skip-lint = false
+
 [programs.localnet]
 mango_v3_reimbursement = "m3roABq4Ta3sGyFRLdY4LH1KN16zBtg586gJ3UxoBzb"
 

@@ -16,7 +16,7 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = {version = "0.25.0", features = ["init-if-needed"]}
-anchor-spl = "0.25.0"
+anchor-lang = { path = "../../../mango-v4/anchor/lang" }
+anchor-spl = { path = "../../../mango-v4/anchor/spl" }
 solana-program = "~1.10.29"
 static_assertions = "1.1"
