@@ -11,6 +11,7 @@ import { MangoV3ReimbursementClient } from "./client";
 import BN from "bn.js";
 import fs from "fs";
 import { set } from "@project-serum/anchor/dist/cjs/utils/features";
+import { ClientRequest } from "http";
 
 const CLUSTER_URL =
   process.env.CLUSTER_URL_OVERRIDE || process.env.MB_CLUSTER_URL;
@@ -164,7 +165,11 @@ async function main() {
     );
   }
 
-  console.log(`${reimbursementAccount}`);
+  const table = await mangoV3ReimbursementClient.decodeTable(group);
+  const balancesForUser = table.rows.find((row) =>
+    row.owner.equals(admin.publicKey)
+  ).balances;
+
   sig = await mangoV3ReimbursementClient.program.methods
     .reimburse(new BN(0), new BN(0), false)
     .accounts({

@@ -1,4 +1,4 @@
-import { Program, Provider } from "@project-serum/anchor";
+import { Program, ProgramAccount, Provider } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { MangoV3Reimbursement, IDL } from "./mango_v3_reimbursement";
 
@@ -12,5 +12,19 @@ export class MangoV3ReimbursementClient {
       ID,
       provider
     );
+  }
+
+  public async decodeTable(group) {
+    const ai = await this.program.provider.connection.getAccountInfo(
+      group.account.table
+    );
+
+    if (!ai) {
+      throw new Error(`Table ai cannot be undefined!`);
+    }
+
+    return (this.program as any)._coder.accounts.accountLayouts
+      .get("table")
+      .decode(ai.data.subarray(40));
   }
 }
