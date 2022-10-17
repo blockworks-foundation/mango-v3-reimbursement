@@ -19,7 +19,7 @@ First calculate the re-imbursement from a recent solana snapshot, we used Slot 1
 
 - download the [solana snapshot](https://drive.google.com/file/d/1nYJjW0n2pSpAOwf7kUR_p-Cj2PpS3kcn/view?usp=sharing)
 - download the [deposits & withdrawals](https://docs.google.com/spreadsheets/d/1DwtllQeCw3j9-DjNFgxSk_Gl_L8405W9ExjeqvKVjds/edit#gid=0) since snapshot as tsv
-- compile PR #208 on v3 and the following two commands to generate a csv as well as a binary buffer
+- compile [PR #208 on mango-v3](https://github.com/blockworks-foundation/mango-v3/pull/208) and the following two commands to generate a csv as well as a binary buffer
 
 ```
 cargo --bin cli equity-from-snapshot \
