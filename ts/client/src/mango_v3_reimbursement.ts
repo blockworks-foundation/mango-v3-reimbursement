@@ -66,6 +66,42 @@ export type MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "editGroup",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "table",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "createVault",
       "accounts": [
         {
@@ -251,6 +287,75 @@ export type MangoV3Reimbursement = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "reimburse",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reimbursementAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mangoAccountOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "indexIntoTable",
+          "type": "u64"
+        },
+        {
+          "name": "tokenIndex",
+          "type": "u64"
+        },
+        {
+          "name": "transferClaim",
+          "type": "bool"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -307,11 +412,15 @@ export type MangoV3Reimbursement = {
             "type": "u8"
           },
           {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           }
@@ -355,7 +464,7 @@ export type MangoV3Reimbursement = {
                 {
                   "defined": "Row"
                 },
-                32000
+                1
               ]
             }
           }
@@ -462,6 +571,42 @@ export const IDL: MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "editGroup",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "table",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "createVault",
       "accounts": [
         {
@@ -647,6 +792,75 @@ export const IDL: MangoV3Reimbursement = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "reimburse",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "reimbursementAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mangoAccountOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "indexIntoTable",
+          "type": "u64"
+        },
+        {
+          "name": "tokenIndex",
+          "type": "u64"
+        },
+        {
+          "name": "transferClaim",
+          "type": "bool"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -703,11 +917,15 @@ export const IDL: MangoV3Reimbursement = {
             "type": "u8"
           },
           {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           }
@@ -751,7 +969,7 @@ export const IDL: MangoV3Reimbursement = {
                 {
                   "defined": "Row"
                 },
-                32000
+                1
               ]
             }
           }

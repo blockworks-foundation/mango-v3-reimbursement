@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Token;
 
 use crate::state::Group;
+use crate::Error;
 
 #[derive(Accounts)]
 #[instruction(group_num: u32)]
@@ -36,5 +37,6 @@ pub fn handle_create_group(
     group.table = table;
     group.claim_transfer_destination = claim_transfer_destination;
     group.authority = ctx.accounts.authority.key();
+    group.bump = *ctx.bumps.get("group").ok_or(Error::SomeError)?;
     Ok(())
 }

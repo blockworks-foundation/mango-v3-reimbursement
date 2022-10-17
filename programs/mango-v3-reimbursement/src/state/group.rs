@@ -13,7 +13,8 @@ pub struct Group {
     pub claim_mints: [Pubkey; 16],
     pub mints: [Pubkey; 16],
     pub reimbursement_started: u8,
-    pub padding: [u8; 3],
+    pub bump: u8,
+    pub padding: [u8; 2],
 }
 const_assert_eq!(
     size_of::<Group>(),

@@ -4,7 +4,6 @@ use anchor_spl::token::Token;
 use crate::state::{Group, ReimbursementAccount};
 
 #[derive(Accounts)]
-#[instruction(token_index: usize)]
 pub struct CreateReimbursementAccount<'info> {
     pub group: AccountLoader<'info, Group>,
 

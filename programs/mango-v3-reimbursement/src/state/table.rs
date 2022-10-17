@@ -5,9 +5,9 @@ use static_assertions::const_assert_eq;
 
 #[account(zero_copy)]
 pub struct Table {
-    rows: [Row; 32000],
+    pub rows: [Row; 1],
 }
-const_assert_eq!(size_of::<Table>(), (32 + 8 * 16) * 32000);
+const_assert_eq!(size_of::<Table>(), (32 + 8 * 16) * 1);
 const_assert_eq!(size_of::<Table>() % 8, 0);
 
 #[derive(Copy, Clone, AnchorSerialize, AnchorDeserialize)]
