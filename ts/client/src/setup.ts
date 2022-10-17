@@ -185,6 +185,9 @@ async function main() {
       sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
     }`
   );
+
+  // TODO
+  // decoding the table on client side
 }
 
 main();
