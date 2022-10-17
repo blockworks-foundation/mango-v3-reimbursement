@@ -13,6 +13,7 @@ import fs from "fs";
 import { set } from "@project-serum/anchor/dist/cjs/utils/features";
 import { ClientRequest } from "http";
 
+/// Env
 const CLUSTER_URL =
   process.env.CLUSTER_URL_OVERRIDE || process.env.MB_CLUSTER_URL;
 const PAYER_KEYPAIR =
@@ -28,6 +29,7 @@ const MANGO_V3_GROUP_NAME: Cluster =
 const options = AnchorProvider.defaultOptions();
 const connection = new Connection(CLUSTER_URL!, options);
 
+// Mango v3 client setup
 const config = Config.ids();
 const groupIds = config.getGroup(MANGO_V3_CLUSTER, MANGO_V3_GROUP_NAME);
 if (!groupIds) {
@@ -40,8 +42,8 @@ const mangoV3Client = new MangoClient(connection, mangoProgramId);
 Error.stackTraceLimit = 1000;
 
 async function main() {
+  // Client setup
   let sig;
-
   const admin = Keypair.fromSecretKey(
     Buffer.from(JSON.parse(fs.readFileSync(PAYER_KEYPAIR!, "utf-8")))
   );
@@ -49,6 +51,7 @@ async function main() {
   const provider = new AnchorProvider(connection, adminWallet, options);
   const mangoV3ReimbursementClient = new MangoV3ReimbursementClient(provider);
 
+  // Create group if not already
   if (
     !(await mangoV3ReimbursementClient.program.account.group.all()).find(
       (group) => group.account.groupNum === GROUP_NUM
@@ -78,6 +81,7 @@ async function main() {
     await mangoV3ReimbursementClient.program.account.group.all()
   ).find((group) => group.account.groupNum === GROUP_NUM);
 
+  // Edit group, set new table
   await mangoV3ReimbursementClient.program.methods
     .editGroup(new PublicKey("tabWqAkVwFcPGJTmEaik9KSbcDqRJRH4d39oyBrRzCn"))
     .accounts({
@@ -86,19 +90,27 @@ async function main() {
         .wallet.publicKey,
     })
     .rpc();
+
+  // Reload table
   group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
     (group) => group.account.groupNum === GROUP_NUM
   );
 
+  // Create vaults
   for (const [index, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
   ).tokens.entries()!) {
+    // If token for index is set in v3
     if (tokenInfo.mint.equals(PublicKey.default)) {
       continue;
     }
+
+    // If token is still active in v3
     if (tokenInfo.oracleInactive === true) {
       continue;
     }
+
+    // If vault has not already been created
     if (!group?.account.vaults[index].equals(PublicKey.default)) {
       continue;
     }
@@ -119,6 +131,7 @@ async function main() {
     );
   }
 
+  // Set start reimbursement flag to true
   if (group?.account.reimbursementStarted === 0) {
     sig = await mangoV3ReimbursementClient.program.methods
       .startReimbursement()
@@ -136,6 +149,7 @@ async function main() {
     );
   }
 
+  // Create reimbursement account if not already created
   const reimbursementAccount = (
     await PublicKey.findProgramAddress(
       [
@@ -165,11 +179,13 @@ async function main() {
     );
   }
 
+  // Table decoding example
   const table = await mangoV3ReimbursementClient.decodeTable(group);
   const balancesForUser = table.rows.find((row) =>
     row.owner.equals(admin.publicKey)
   ).balances;
 
+  // Example - reimburse for first token
   sig = await mangoV3ReimbursementClient.program.methods
     .reimburse(new BN(0), new BN(0), false)
     .accounts({
@@ -190,9 +206,6 @@ async function main() {
       sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
     }`
   );
-
-  // TODO
-  // decoding the table on client side
 }
 
 main();
