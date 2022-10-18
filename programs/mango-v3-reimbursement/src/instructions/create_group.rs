@@ -1,6 +1,8 @@
+use std::mem::size_of;
+
 use anchor_lang::prelude::*;
 
-use crate::state::Group;
+use crate::state::{Group, Row};
 use crate::Error;
 
 #[derive(Accounts)]
@@ -15,6 +17,8 @@ pub struct CreateGroup<'info> {
     )]
     pub group: AccountLoader<'info, Group>,
 
+    pub table: UncheckedAccount<'info>,
+
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -26,23 +30,32 @@ pub struct CreateGroup<'info> {
 pub fn handle_create_group(
     ctx: Context<CreateGroup>,
     group_num: u32,
-    table: Pubkey,
     claim_transfer_destination: Pubkey,
     testing: u8,
 ) -> Result<()> {
-    msg!(
-        "Creating group {:?} with table {:?} and claim_transfer_destination {:?}",
-        group_num,
-        table,
-        claim_transfer_destination
-    );
-
     let mut group = ctx.accounts.group.load_init()?;
     group.group_num = group_num;
-    group.table = table;
+    group.table = ctx.accounts.table.key();
     group.claim_transfer_destination = claim_transfer_destination;
     group.authority = ctx.accounts.authority.key();
     group.bump = *ctx.bumps.get("group").ok_or(Error::SomeError)?;
     group.testing = testing;
+
+    // Sanity checks on table
+    let table_ai = &ctx.accounts.table;
+    if !group.is_testing() {
+        // require_keys_eq!(table_ai.owner, ctx.accounts.authority.key());
+    }
+    let data = table_ai.try_borrow_data()?;
+    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
+
+    msg!(
+        "Creating group {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
+        group_num,
+        ctx.accounts.table.key(),
+        (data.len() - 40) / size_of::<Row>() + 1,
+        claim_transfer_destination
+    );
+
     Ok(())
 }

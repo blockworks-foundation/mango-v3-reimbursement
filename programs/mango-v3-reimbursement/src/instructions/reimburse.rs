@@ -1,4 +1,6 @@
-use crate::state::{Group, ReimbursementAccount, Table};
+use std::mem::size_of;
+
+use crate::state::{Group, ReimbursementAccount, Row};
 use crate::Error;
 use anchor_lang::{__private::bytemuck, prelude::*};
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
@@ -27,7 +29,7 @@ pub struct Reimburse<'info> {
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
         constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index),
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index),        
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index)
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
     pub mango_account_owner: UncheckedAccount<'info>,
@@ -70,11 +72,9 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     // Verify entry in reimbursement table
     let table_ai = &ctx.accounts.table;
     let data = table_ai.try_borrow_data()?;
-    let table: &Table = bytemuck::from_bytes::<Table>(&data[40..]);
-    require_keys_eq!(
-        table.rows[index_into_table].owner,
-        ctx.accounts.mango_account_owner.key()
-    );
+    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
+    let row: &Row = bytemuck::from_bytes::<Row>(&data[40 + index_into_table * size_of::<Row>()..]);
+    require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
 
     token::transfer(
         {
@@ -91,7 +91,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                 ],
             ])
         },
-        table.rows[index_into_table].balances[token_index],
+        row.balances[token_index],
     )?;
     let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
     reimbursement_account.mark_reimbursed(token_index);
@@ -112,7 +112,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                     ]],
                 )
             },
-            table.rows[index_into_table].balances[token_index],
+            row.balances[token_index],
         )?;
         reimbursement_account.mark_claim_transferred(token_index);
     }
