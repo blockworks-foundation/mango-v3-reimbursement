@@ -246,31 +246,32 @@ async function main() {
     );
   mangoV3ReimbursementClient.reimbursed(ra, 0);
 
-  // Example - reimburse for first token
-  sig = await mangoV3ReimbursementClient.program.methods
-    .reimburse(new BN(0), new BN(0), true)
-    .accounts({
-      group: (group as any).publicKey,
-      vault: group?.account.vaults[0],
-      tokenAccount: await getAssociatedTokenAddress(
-        group?.account.mints[0]!,
-        admin.publicKey
-      ),
-      reimbursementAccount,
-      claimMint: group?.account.claimMints[0],
-      claimMintTokenAccount: await getAssociatedTokenAddress(
-        group?.account.claimMints[0]!,
-        group?.account.claimTransferDestination!
-      ),
-      mangoAccountOwner: admin.publicKey,
-      table: group?.account.table,
-    })
-    .rpc({ skipPreflight: true });
-  console.log(
-    `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
-      sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
-    }`
-  );
+  for (const i in [0, 2, 4]) {
+    sig = await mangoV3ReimbursementClient.program.methods
+      .reimburse(new BN(0), new BN(0), true)
+      .accounts({
+        group: (group as any).publicKey,
+        vault: group?.account.vaults[0],
+        tokenAccount: await getAssociatedTokenAddress(
+          group?.account.mints[0]!,
+          admin.publicKey
+        ),
+        reimbursementAccount,
+        claimMint: group?.account.claimMints[0],
+        claimMintTokenAccount: await getAssociatedTokenAddress(
+          group?.account.claimMints[0]!,
+          group?.account.claimTransferDestination!
+        ),
+        mangoAccountOwner: admin.publicKey,
+        table: group?.account.table,
+      })
+      .rpc({ skipPreflight: true });
+    console.log(
+      `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
+        sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
+      }`
+    );
+  }
 }
 
 main();

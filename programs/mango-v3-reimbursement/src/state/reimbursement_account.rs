@@ -14,7 +14,7 @@ const_assert_eq!(size_of::<ReimbursementAccount>() % 8, 0);
 
 impl ReimbursementAccount {
     pub fn reimbursed(&self, token_index: usize) -> bool {
-        self.reimbursed & (1 << token_index) == 1
+        self.reimbursed & (1 << token_index) != 0
     }
 
     pub fn mark_reimbursed(&mut self, token_index: usize) {
@@ -22,7 +22,7 @@ impl ReimbursementAccount {
     }
 
     pub fn claim_transferred(&self, token_index: usize) -> bool {
-        self.claim_transferred & (1 << token_index) == 1
+        self.claim_transferred & (1 << token_index) != 0
     }
 
     pub fn mark_claim_transferred(&mut self, token_index: usize) {
