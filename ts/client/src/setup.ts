@@ -96,7 +96,7 @@ async function main() {
         1
       )
       .accounts({
-        table: new PublicKey("tabWqAkVwFcPGJTmEaik9KSbcDqRJRH4d39oyBrRzCn"),
+        table: new PublicKey("tab5DYiG5GXtdKjBSKFjY2RJc4zzo3WnWPDYM2FfeUd"),
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
         authority: (
@@ -116,7 +116,7 @@ async function main() {
 
   // // Edit group, set new table
   // await mangoV3ReimbursementClient.program.methods
-  //   .editGroup(new PublicKey("tabWqAkVwFcPGJTmEaik9KSbcDqRJRH4d39oyBrRzCn"))
+  //   .editGroup(new PublicKey("tab5DYiG5GXtdKjBSKFjY2RJc4zzo3WnWPDYM2FfeUd"))
   //   .accounts({
   //     group: group?.publicKey,
   //     authority: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
