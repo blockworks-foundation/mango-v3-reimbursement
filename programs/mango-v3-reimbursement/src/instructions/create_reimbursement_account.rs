@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Token;
 
 use crate::state::{Group, ReimbursementAccount};
 
@@ -16,12 +15,17 @@ pub struct CreateReimbursementAccount<'info> {
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
 
-    pub mango_account_owner: Signer<'info>,
+    /// CHECK: address is part of the ReimbursementAccount PDA
+    pub mango_account_owner: UncheckedAccount<'info>,
+
+    #[account (
+        constraint = signer.key() == mango_account_owner.key() || signer.key() == group.load()?.authority
+    )]
+    pub signer: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }
