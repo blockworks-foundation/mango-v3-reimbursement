@@ -1,6 +1,7 @@
 node_modules
 dist
 ts/**/*.js
+.vscode
 
 .anchor
 target
