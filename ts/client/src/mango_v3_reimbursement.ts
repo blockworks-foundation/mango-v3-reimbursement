@@ -209,11 +209,6 @@ export type MangoV3Reimbursement = {
           "isSigner": false
         },
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -685,11 +680,6 @@ export const IDL: MangoV3Reimbursement = {
           "name": "mangoAccountOwner",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "payer",

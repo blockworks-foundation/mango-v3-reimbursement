@@ -15,7 +15,7 @@ pub struct Reimburse<'info> {
 
     #[account(
         mut,
-        address = group.load()?.vaults[token_index]
+        // constraint = vault.key() == group.load()?.vaults[token_index]
     )]
     pub vault: Account<'info, TokenAccount>,
 
@@ -28,6 +28,7 @@ pub struct Reimburse<'info> {
         mut,
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
+        // TODO: move contraints with token_index to inline
         constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index),
         constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index)
     )]
@@ -48,7 +49,7 @@ pub struct Reimburse<'info> {
     pub claim_mint_token_account: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        address = group.load()?.claim_mints[token_index]
+        // constraint = claim_mint.key() == group.load()?.claim_mints[token_index]
     )]
     pub claim_mint: Box<Account<'info, Mint>>,
 
@@ -69,6 +70,11 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     require!(token_index < 16usize, Error::SomeError);
 
     let group = ctx.accounts.group.load()?;
+    require_keys_eq!(ctx.accounts.vault.key(), group.vaults[token_index]);
+    require_keys_eq!(
+        ctx.accounts.claim_mint.key(),
+        group.claim_mints[token_index]
+    );
 
     // Verify entry in reimbursement table
     let table_ai = &ctx.accounts.table;

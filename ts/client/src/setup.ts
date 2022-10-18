@@ -9,13 +9,16 @@ import {
   Keypair,
   PublicKey,
   SystemProgram,
+  Transaction,
   TransactionInstruction,
 } from "@solana/web3.js";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  createTransferCheckedInstruction,
   getAssociatedTokenAddress,
   getMint,
   TOKEN_PROGRAM_ID,
+  TYPE_SIZE,
 } from "@solana/spl-token";
 import { MangoV3ReimbursementClient } from "./client";
 import BN from "bn.js";
@@ -147,6 +150,7 @@ async function main() {
     if (!group?.account.vaults[index].equals(PublicKey.default)) {
       continue;
     }
+
     let bU64 = Buffer.alloc(8);
     bU64.writeBigUInt64LE(BigInt(index));
     const claimMint = (
@@ -176,11 +180,65 @@ async function main() {
       })
       .rpc();
     console.log(
-      `setup vault, sig https://explorer.solana.com/tx/${
+      `setup vault for ${
+        groupIds?.tokens.filter((token) =>
+          token.mintKey.equals(tokenInfo.mint)
+        )[0].symbol
+      } at index ${index} , sig https://explorer.solana.com/tx/${
         sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
       }`
     );
   }
+
+  // // Top up vaults
+  // groupIds?.tokens
+  //   .filter(
+  //     (token) =>
+  //       token.symbol.includes("BTC") ||
+  //       token.symbol.includes("ETH") ||
+  //       token.symbol.includes("SOL") ||
+  //       token.symbol.includes("USDC")
+  //   )
+  //   .forEach(async (token) => {
+  //     const i = group?.account.mints.findIndex((mint) =>
+  //       mint.equals(token.mintKey)
+  //     );
+  //     if (!i) {
+  //       throw new Error("Token not found!");
+  //     }
+  //     const latestBlockhash = await connection.getLatestBlockhash();
+  //     const tx = new Transaction({
+  //       blockhash: latestBlockhash.blockhash,
+  //       lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+  //     });
+  //     tx.add(
+  //       createTransferCheckedInstruction(
+  //         await getAssociatedTokenAddress(
+  //           group?.account.mints[i]!,
+  //           admin.publicKey
+  //         ),
+  //         group?.account.mints[i]!,
+  //         group?.account.vaults[i]!,
+  //         admin.publicKey,
+  //         10,
+  //         token.decimals
+  //       )
+  //     );
+  //     tx.recentBlockhash = await (
+  //       await connection.getLatestBlockhash()
+  //     ).blockhash;
+  //     tx.sign(admin);
+  //     let sig = await connection.sendRawTransaction(tx.serialize(), {
+  //       skipPreflight: true,
+  //     });
+  //     console.log(
+  //       `topped up ${token.symbol} vault ${group?.account.vaults[
+  //         i
+  //       ]!}, sig https://explorer.solana.com/tx/${
+  //         sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
+  //       }`
+  //     );
+  //   });
 
   // Reload group
   group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
@@ -246,32 +304,47 @@ async function main() {
     );
   mangoV3ReimbursementClient.reimbursed(ra, 0);
 
-  for (const i in [0, 2, 4]) {
-    sig = await mangoV3ReimbursementClient.program.methods
-      .reimburse(new BN(0), new BN(0), true)
-      .accounts({
-        group: (group as any).publicKey,
-        vault: group?.account.vaults[i],
-        tokenAccount: await getAssociatedTokenAddress(
-          group?.account.mints[i]!,
-          admin.publicKey
-        ),
-        reimbursementAccount,
-        claimMint: group?.account.claimMints[i],
-        claimMintTokenAccount: await getAssociatedTokenAddress(
-          group?.account.claimMints[i]!,
-          group?.account.claimTransferDestination!
-        ),
-        mangoAccountOwner: admin.publicKey,
-        table: group?.account.table,
-      })
-      .rpc({ skipPreflight: true });
-    console.log(
-      `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
-        sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
-      }`
-    );
-  }
+  // Reimburse
+  groupIds?.tokens
+    .filter(
+      (token) =>
+        token.symbol.includes("BTC") ||
+        token.symbol.includes("ETH") ||
+        token.symbol.includes("SOL") ||
+        token.symbol.includes("USDC")
+    )
+    .forEach(async (token) => {
+      const i = group?.account.mints.findIndex((mint) =>
+        mint.equals(token.mintKey)
+      );
+      if (!i) {
+        throw new Error("Token not found!");
+      }
+      sig = await mangoV3ReimbursementClient.program.methods
+        .reimburse(new BN(0), new BN(i), true)
+        .accounts({
+          group: (group as any).publicKey,
+          vault: group?.account.vaults[i],
+          tokenAccount: await getAssociatedTokenAddress(
+            group?.account.mints[i]!,
+            admin.publicKey
+          ),
+          reimbursementAccount,
+          claimMint: group?.account.claimMints[i],
+          claimMintTokenAccount: await getAssociatedTokenAddress(
+            group?.account.claimMints[i]!,
+            group?.account.claimTransferDestination!
+          ),
+          mangoAccountOwner: admin.publicKey,
+          table: group?.account.table,
+        })
+        .rpc({ skipPreflight: true });
+      console.log(
+        `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
+          sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
+        }`
+      );
+    });
 }
 
 main();
