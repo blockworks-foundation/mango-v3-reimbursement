@@ -1,5 +1,5 @@
 {
-  "name": "mango_v3_reimbursement_lib",
+  "name": "@blockworks-foundation/mango-v3-reimbursement-lib",
   "license": "MIT",
   "version": "1.0.0",
   "scripts": {
