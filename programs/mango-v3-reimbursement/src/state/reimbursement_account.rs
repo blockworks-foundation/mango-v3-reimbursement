@@ -22,7 +22,7 @@ impl ReimbursementAccount {
     }
 
     pub fn claim_transferred(&self, token_index: usize) -> bool {
-        self.reimbursed & (1 << token_index) == 1
+        self.claim_transferred & (1 << token_index) == 1
     }
 
     pub fn mark_claim_transferred(&mut self, token_index: usize) {

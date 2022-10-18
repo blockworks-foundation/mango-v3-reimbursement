@@ -15,22 +15,18 @@ pub mod mango_v3_reimbursement {
     pub fn create_group(
         ctx: Context<CreateGroup>,
         group_num: u32,
-        table: Pubkey,
         claim_transfer_destination: Pubkey,
+        testing: u8,
     ) -> Result<()> {
-        handle_create_group(ctx, group_num, table, claim_transfer_destination)
+        handle_create_group(ctx, group_num, claim_transfer_destination, testing)
     }
 
     pub fn edit_group(ctx: Context<EditGroup>, table: Pubkey) -> Result<()> {
         handle_edit_group(ctx, table)
     }
 
-    pub fn create_vault(
-        ctx: Context<CreateVault>,
-        token_index: usize,
-        mint_decimals: u8,
-    ) -> Result<()> {
-        handle_create_vault(ctx, token_index, mint_decimals)
+    pub fn create_vault(ctx: Context<CreateVault>, token_index: usize) -> Result<()> {
+        handle_create_vault(ctx, token_index)
     }
 
     pub fn create_reimbursement_account(ctx: Context<CreateReimbursementAccount>) -> Result<()> {

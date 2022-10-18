@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Token;
 
 use crate::state::{Group, ReimbursementAccount};
 
@@ -8,7 +7,7 @@ pub struct CreateReimbursementAccount<'info> {
     pub group: AccountLoader<'info, Group>,
 
     #[account(
-        init,
+        init_if_needed,
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
         payer = payer,
@@ -16,12 +15,12 @@ pub struct CreateReimbursementAccount<'info> {
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
 
-    pub mango_account_owner: Signer<'info>,
+    /// CHECK: we want this be permissionless
+    pub mango_account_owner: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

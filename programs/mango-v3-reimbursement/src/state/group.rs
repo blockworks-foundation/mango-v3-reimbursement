@@ -14,7 +14,8 @@ pub struct Group {
     pub mints: [Pubkey; 16],
     pub reimbursement_started: u8,
     pub bump: u8,
-    pub padding: [u8; 2],
+    pub testing: u8,
+    pub padding: [u8; 1],
 }
 const_assert_eq!(
     size_of::<Group>(),
@@ -25,5 +26,9 @@ const_assert_eq!(size_of::<Group>() % 8, 0);
 impl Group {
     pub fn has_reimbursement_started(&self) -> bool {
         self.reimbursement_started == 1
+    }
+
+    pub fn is_testing(&self) -> bool {
+        self.testing == 1
     }
 }

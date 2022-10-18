@@ -92,17 +92,18 @@ async function main() {
     const sig = await mangoV3ReimbursementClient.program.methods
       .createGroup(
         GROUP_NUM,
-        new PublicKey("tab26VnfeLLkhVUa87mt5EWHA5PAbrVL1NCuSvZUSvc"),
-        new PublicKey("mdcXrm2NkzXYvHNcKXzCLXT58R4UN8Rzd1uzD4h8338")
+        new PublicKey("mdcXrm2NkzXYvHNcKXzCLXT58R4UN8Rzd1uzD4h8338"),
+        1
       )
       .accounts({
+        table: new PublicKey("tab5DYiG5GXtdKjBSKFjY2RJc4zzo3WnWPDYM2FfeUd"),
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
         authority: (
           mangoV3ReimbursementClient.program.provider as AnchorProvider
         ).wallet.publicKey,
       })
-      .rpc();
+      .rpc({ skipPreflight: true });
     console.log(
       `created group, sig https://explorer.solana.com/tx/${
         sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
@@ -115,7 +116,7 @@ async function main() {
 
   // // Edit group, set new table
   // await mangoV3ReimbursementClient.program.methods
-  //   .editGroup(new PublicKey("tabWqAkVwFcPGJTmEaik9KSbcDqRJRH4d39oyBrRzCn"))
+  //   .editGroup(new PublicKey("tab5DYiG5GXtdKjBSKFjY2RJc4zzo3WnWPDYM2FfeUd"))
   //   .accounts({
   //     group: group?.publicKey,
   //     authority: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
@@ -123,7 +124,7 @@ async function main() {
   //   })
   //   .rpc();
 
-  // Reload table
+  // Reload group
   group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
     (group) => group.account.groupNum === GROUP_NUM
   );
@@ -146,12 +147,30 @@ async function main() {
     if (!group?.account.vaults[index].equals(PublicKey.default)) {
       continue;
     }
-    const mint = await getMint(connection, tokenInfo.mint);
+    let bU64 = Buffer.alloc(8);
+    bU64.writeBigUInt64LE(BigInt(index));
+    const claimMint = (
+      await PublicKey.findProgramAddress(
+        [Buffer.from("Mint"), group?.publicKey.toBuffer()!, bU64],
+        mangoV3ReimbursementClient.program.programId
+      )
+    )[0];
+    const claimTransferTokenAccount = await getAssociatedTokenAddress(
+      claimMint,
+      group.account.claimTransferDestination
+    );
     const sig = await mangoV3ReimbursementClient.program.methods
-      .createVault(new BN(index), mint.decimals)
+      .createVault(new BN(index))
       .accounts({
+        vault: await getAssociatedTokenAddress(
+          tokenInfo.mint,
+          group.publicKey,
+          true
+        ),
         group: (group as any).publicKey,
         mint: tokenInfo.mint,
+        claimTransferTokenAccount,
+        claimTransferDestination: group.account.claimTransferDestination,
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
       })
@@ -162,6 +181,11 @@ async function main() {
       }`
     );
   }
+
+  // Reload group
+  group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
+    (group) => group.account.groupNum === GROUP_NUM
+  );
 
   // Set start reimbursement flag to true
   if (group?.account.reimbursementStarted === 0) {
@@ -212,8 +236,8 @@ async function main() {
   }
 
   // Table decoding example
-  const table = await mangoV3ReimbursementClient.decodeTable(group?.account);
-  table.rows.find((row) => row.owner.equals(admin.publicKey)).balances;
+  const rows = await mangoV3ReimbursementClient.decodeTable(group?.account);
+  rows.find((row) => row.owner.equals(admin.publicKey)).balances;
 
   // Reimbursement decoding example
   const ra =
@@ -232,7 +256,6 @@ async function main() {
         group?.account.mints[0]!,
         admin.publicKey
       ),
-      mint: group?.account.mints[0],
       reimbursementAccount,
       claimMint: group?.account.claimMints[0],
       claimMintTokenAccount: await getAssociatedTokenAddress(
@@ -242,20 +265,7 @@ async function main() {
       mangoAccountOwner: admin.publicKey,
       table: group?.account.table,
     })
-    .preInstructions([
-      await createAssociatedTokenAccountIdempotentInstruction(
-        (mangoV3ReimbursementClient.program.provider as AnchorProvider).wallet
-          .publicKey,
-        group?.account.claimTransferDestination!,
-        group?.account.claimMints[0]!,
-        await getAssociatedTokenAddress(
-          group?.account.claimMints[0]!,
-          group?.account.claimTransferDestination!,
-          true
-        )
-      ),
-    ])
-    .rpc();
+    .rpc({ skipPreflight: true });
   console.log(
     `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
       sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
