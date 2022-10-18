@@ -19,7 +19,7 @@ pub struct CreateGroup<'info> {
 
     pub table: UncheckedAccount<'info>,
 
-    #[account(mut)]
+#[account(mut)]
     pub payer: Signer<'info>,
 
     pub authority: Signer<'info>,
@@ -43,10 +43,10 @@ pub fn handle_create_group(
 
     // Sanity checks on table
     let table_ai = &ctx.accounts.table;
-    if !group.is_testing() {
-        // require_keys_eq!(table_ai.owner, ctx.accounts.authority.key());
-    }
     let data = table_ai.try_borrow_data()?;
+    if !group.is_testing() {
+        require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
+    }
     require_eq!((data.len() - 40) % size_of::<Row>(), 0);
 
     msg!(
