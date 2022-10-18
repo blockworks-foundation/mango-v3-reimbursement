@@ -15,7 +15,12 @@ pub struct CreateReimbursementAccount<'info> {
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
 
-    pub mango_account_owner: Signer<'info>,
+    pub mango_account_owner: UncheckedAccount<'info>,
+
+    #[account (
+        constraint = signer.key() == mango_account_owner.key() || signer.key() == group.load()?.authority
+    )]
+    pub signer: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,

@@ -28,12 +28,21 @@ pub fn handle_create_group(
     group_num: u32,
     table: Pubkey,
     claim_transfer_destination: Pubkey,
+    testing: u8,
 ) -> Result<()> {
+    msg!(
+        "Creating group {:?} with table {:?} and claim_transfer_destination {:?}",
+        group_num,
+        table,
+        claim_transfer_destination
+    );
+
     let mut group = ctx.accounts.group.load_init()?;
     group.group_num = group_num;
     group.table = table;
     group.claim_transfer_destination = claim_transfer_destination;
     group.authority = ctx.accounts.authority.key();
     group.bump = *ctx.bumps.get("group").ok_or(Error::SomeError)?;
+    group.testing = testing;
     Ok(())
 }

@@ -1,7 +1,7 @@
+use crate::state::{Group, ReimbursementAccount, Table};
+use crate::Error;
 use anchor_lang::{__private::bytemuck, prelude::*};
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
-
-use crate::state::{Group, ReimbursementAccount, Table};
 
 #[derive(Accounts)]
 #[instruction(token_index: usize)]
@@ -18,11 +18,6 @@ pub struct Reimburse<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        address = group.load()?.mints[token_index]
-    )]
-    pub mint: Box<Account<'info, Mint>>,
-
-    #[account(
         mut,
         constraint = token_account.owner == mango_account_owner.key()
     )]
@@ -31,18 +26,21 @@ pub struct Reimburse<'info> {
         mut,
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
-        // TODO: enable after testing is done
-        // constraint = !reimbursement_account.load()?.reimbursed(token_index),
-        // constraint = !reimbursement_account.load()?.claim_transferred(token_index),        
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index),
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index),        
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
-    pub mango_account_owner: Signer<'info>,
+    pub mango_account_owner: UncheckedAccount<'info>,
+
+    #[account (
+        constraint = signer.key() == mango_account_owner.key() || signer.key() == group.load()?.authority
+    )]
+    pub signer: Signer<'info>,
 
     #[account(
         mut,
-        constraint = claim_mint_token_account.owner == group.load()?.claim_transfer_destination,
         associated_token::mint = claim_mint,
-        associated_token::authority = group,
+        associated_token::authority = group.load()?.claim_transfer_destination,
     )]
     pub claim_mint_token_account: Box<Account<'info, TokenAccount>>,
     #[account(
@@ -65,6 +63,8 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     token_index: usize,
     transfer_claim: bool,
 ) -> Result<()> {
+    require!(token_index < 16usize, Error::SomeError);
+
     let group = ctx.accounts.group.load()?;
 
     // Verify entry in reimbursement table

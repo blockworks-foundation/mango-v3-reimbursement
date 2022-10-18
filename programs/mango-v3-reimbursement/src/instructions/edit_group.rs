@@ -7,15 +7,13 @@ pub struct EditGroup<'info> {
     #[account(
         mut,
         has_one = authority,
-        constraint = !group.load()?.has_reimbursement_started()
+        constraint = group.load()?.is_testing(),
     )]
     pub group: AccountLoader<'info, Group>,
 
     pub authority: Signer<'info>,
 }
 
-// TODO: remove once we go live, create_group also supports taking table,
-// this is just a backup for testing without requiring a new group everytime
 pub fn handle_edit_group(ctx: Context<EditGroup>, table: Pubkey) -> Result<()> {
     let mut group = ctx.accounts.group.load_mut()?;
     group.table = table;
