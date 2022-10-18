@@ -1,26 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "noImplicitAny": false,
-    "sourceMap": true,
-    "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
+    "target": "es5",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "types": ["mocha", "chai"],
-    "typeRoots": ["./node_modules/@types"]
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": true,
+    "outDir": "./dist",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true
   },
-  "include": ["ts/client/src"],
+  "include": ["ts/client/src/*.ts"],
   "exclude": ["node_modules"]
 }

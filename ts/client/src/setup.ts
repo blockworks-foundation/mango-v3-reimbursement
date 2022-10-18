@@ -30,11 +30,11 @@ const CLUSTER_URL =
 const PAYER_KEYPAIR =
   process.env.PAYER_KEYPAIR_OVERRIDE || process.env.MB_PAYER_KEYPAIR;
 const GROUP_NUM = Number(process.env.GROUP_NUM || 5);
-const CLUSTER: Cluster =
+const CLUSTER: any =
   (process.env.CLUSTER_OVERRIDE as Cluster) || "mainnet-beta";
 const MANGO_V3_CLUSTER: Cluster =
   (process.env.MANGO_V3_CLUSTER_OVERRIDE as Cluster) || "mainnet";
-const MANGO_V3_GROUP_NAME: Cluster =
+const MANGO_V3_GROUP_NAME: any =
   (process.env.MANGO_V3_GROUP_NAME_OVERRIDE as Cluster) || "mainnet.1";
 
 const options = AnchorProvider.defaultOptions();
