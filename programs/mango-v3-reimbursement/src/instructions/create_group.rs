@@ -48,8 +48,6 @@ pub fn handle_create_group(
     if !group.is_testing() {
         require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
     }
-    msg!("{:?}", data.len());
-    msg!("{:?}", data.len() - 40 % size_of::<Row>());
     require_eq!((data.len() - 40) % size_of::<Row>(), 0);
 
     msg!(
