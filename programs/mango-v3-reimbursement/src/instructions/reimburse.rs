@@ -62,8 +62,8 @@ pub struct Reimburse<'info> {
 
 pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     ctx: Context<'key, 'accounts, 'remaining, 'info, Reimburse<'info>>,
-    index_into_table: usize,
     token_index: usize,
+    index_into_table: usize,
     transfer_claim: bool,
 ) -> Result<()> {
     require!(token_index < 16usize, Error::SomeError);

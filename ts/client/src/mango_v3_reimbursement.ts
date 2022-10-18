@@ -209,11 +209,6 @@ export type MangoV3Reimbursement = {
           "isSigner": false
         },
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -332,11 +327,11 @@ export type MangoV3Reimbursement = {
       ],
       "args": [
         {
-          "name": "indexIntoTable",
+          "name": "tokenIndex",
           "type": "u64"
         },
         {
-          "name": "tokenIndex",
+          "name": "indexIntoTable",
           "type": "u64"
         },
         {
@@ -687,11 +682,6 @@ export const IDL: MangoV3Reimbursement = {
           "isSigner": false
         },
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -810,11 +800,11 @@ export const IDL: MangoV3Reimbursement = {
       ],
       "args": [
         {
-          "name": "indexIntoTable",
+          "name": "tokenIndex",
           "type": "u64"
         },
         {
-          "name": "tokenIndex",
+          "name": "indexIntoTable",
           "type": "u64"
         },
         {

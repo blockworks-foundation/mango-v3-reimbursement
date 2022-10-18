@@ -321,7 +321,7 @@ async function main() {
         throw new Error("Token not found!");
       }
       sig = await mangoV3ReimbursementClient.program.methods
-        .reimburse(new BN(0), new BN(i), true)
+        .reimburse(new BN(i), new BN(0), true)
         .accounts({
           group: (group as any).publicKey,
           vault: group?.account.vaults[i],
@@ -330,11 +330,11 @@ async function main() {
             admin.publicKey
           ),
           reimbursementAccount,
-          // claimMint: group?.account.claimMints[i],
-          // claimMintTokenAccount: await getAssociatedTokenAddress(
-          //   group?.account.claimMints[i]!,
-          //   group?.account.claimTransferDestination!
-          // ),
+          claimMint: group?.account.claimMints[i],
+          claimMintTokenAccount: await getAssociatedTokenAddress(
+            group?.account.claimMints[i]!,
+            group?.account.claimTransferDestination!
+          ),
           mangoAccountOwner: admin.publicKey,
           table: group?.account.table,
         })

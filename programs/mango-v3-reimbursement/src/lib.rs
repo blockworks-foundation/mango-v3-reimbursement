@@ -39,11 +39,11 @@ pub mod mango_v3_reimbursement {
 
     pub fn reimburse<'key, 'accounts, 'remaining, 'info>(
         ctx: Context<'key, 'accounts, 'remaining, 'info, Reimburse<'info>>,
-        index_into_table: usize,
         token_index: usize,
+        index_into_table: usize,
         transfer_claim: bool,
     ) -> Result<()> {
-        handle_reimburse(ctx, index_into_table, token_index, transfer_claim)
+        handle_reimburse(ctx, token_index, index_into_table, transfer_claim)
     }
 }
 
