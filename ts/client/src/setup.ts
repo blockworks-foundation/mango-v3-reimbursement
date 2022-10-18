@@ -96,7 +96,7 @@ async function main() {
         1
       )
       .accounts({
-        table: new PublicKey("tab26VnfeLLkhVUa87mt5EWHA5PAbrVL1NCuSvZUSvc"),
+        table: new PublicKey("tabWqAkVwFcPGJTmEaik9KSbcDqRJRH4d39oyBrRzCn"),
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
         authority: (
@@ -151,6 +151,11 @@ async function main() {
     const sig = await mangoV3ReimbursementClient.program.methods
       .createVault(new BN(index))
       .accounts({
+        vault: await getAssociatedTokenAddress(
+          tokenInfo.mint,
+          group.publicKey,
+          true
+        ),
         group: (group as any).publicKey,
         mint: tokenInfo.mint,
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
@@ -213,8 +218,8 @@ async function main() {
   }
 
   // Table decoding example
-  const table = await mangoV3ReimbursementClient.decodeTable(group?.account);
-  table.rows.find((row) => row.owner.equals(admin.publicKey)).balances;
+  const rows = await mangoV3ReimbursementClient.decodeTable(group?.account);
+  rows.find((row) => row.owner.equals(admin.publicKey)).balances;
 
   // Reimbursement decoding example
   const ra =
@@ -255,7 +260,7 @@ async function main() {
         )
       ),
     ])
-    .rpc();
+    .rpc({ skipPreflight: true });
   console.log(
     `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${
       sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")

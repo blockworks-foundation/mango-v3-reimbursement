@@ -23,15 +23,22 @@ export class MangoV3ReimbursementClient {
       throw new Error(`Table ai cannot be undefined!`);
     }
 
-    return (this.program as any)._coder.accounts.accountLayouts
-      .get("table")
-      .decode(ai.data.subarray(40));
+    const rowSize = (this.program as any)._coder.types.typeLayouts.get(
+      "Row"
+    ).span;
+    const tableHeaderSize = 40;
+    const rows = (ai.data.length - tableHeaderSize) / rowSize;
+    return [...Array(rows).keys()].map((i) => {
+      const start = tableHeaderSize + i * rowSize;
+      const end = start + rowSize;
+      return (this.program as any)._coder.types.typeLayouts
+        .get("Row")
+        .decode(ai.data.subarray(start, end));
+    });
   }
 
   public reimbursed(reimbursementAccount, tokenIndex): boolean {
-    return (reimbursementAccount.reimbursed & (1 << tokenIndex)) === 0
-      ? false
-      : true;
+    return (reimbursementAccount.reimbursed & (1 << tokenIndex)) !== 0;
   }
 
   public calimTransferred(reimbursementAccount, tokenIndex): boolean {
