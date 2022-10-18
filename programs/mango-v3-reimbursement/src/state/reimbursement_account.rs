@@ -5,7 +5,7 @@ use static_assertions::const_assert_eq;
 
 #[account(zero_copy)]
 pub struct ReimbursementAccount {
-    pub done: u16,
+    pub reimbursed: u16,
     pub claim_transferred: u16,
     pub padding: [u8; 4],
 }
@@ -14,15 +14,15 @@ const_assert_eq!(size_of::<ReimbursementAccount>() % 8, 0);
 
 impl ReimbursementAccount {
     pub fn reimbursed(&self, token_index: usize) -> bool {
-        self.done & (1 << token_index) == 1
+        self.reimbursed & (1 << token_index) == 1
     }
 
     pub fn mark_reimbursed(&mut self, token_index: usize) {
-        self.done |= 1 << token_index
+        self.reimbursed |= 1 << token_index
     }
 
     pub fn claim_transferred(&self, token_index: usize) -> bool {
-        self.done & (1 << token_index) == 1
+        self.reimbursed & (1 << token_index) == 1
     }
 
     pub fn mark_claim_transferred(&mut self, token_index: usize) {

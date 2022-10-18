@@ -445,7 +445,7 @@ export type MangoV3Reimbursement = {
         "kind": "struct",
         "fields": [
           {
-            "name": "done",
+            "name": "reimbursed",
             "type": "u16"
           },
           {
@@ -962,7 +962,7 @@ export const IDL: MangoV3Reimbursement = {
         "kind": "struct",
         "fields": [
           {
-            "name": "done",
+            "name": "reimbursed",
             "type": "u16"
           },
           {

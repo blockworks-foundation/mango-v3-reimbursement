@@ -16,7 +16,7 @@ export class MangoV3ReimbursementClient {
 
   public async decodeTable(group) {
     const ai = await this.program.provider.connection.getAccountInfo(
-      group.account.table
+      group.table
     );
 
     if (!ai) {
@@ -26,5 +26,17 @@ export class MangoV3ReimbursementClient {
     return (this.program as any)._coder.accounts.accountLayouts
       .get("table")
       .decode(ai.data.subarray(40));
+  }
+
+  public reimbursed(reimbursementAccount, tokenIndex): boolean {
+    return (reimbursementAccount.reimbursed & (1 << tokenIndex)) === 0
+      ? false
+      : true;
+  }
+
+  public calimTransferred(reimbursementAccount, tokenIndex): boolean {
+    return (reimbursementAccount.calimTransferred & (1 << tokenIndex)) === 0
+      ? false
+      : true;
   }
 }

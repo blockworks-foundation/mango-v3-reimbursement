@@ -212,10 +212,15 @@ async function main() {
   }
 
   // Table decoding example
-  const table = await mangoV3ReimbursementClient.decodeTable(group);
-  const balancesForUser = table.rows.find((row) =>
-    row.owner.equals(admin.publicKey)
-  ).balances;
+  const table = await mangoV3ReimbursementClient.decodeTable(group?.account);
+  table.rows.find((row) => row.owner.equals(admin.publicKey)).balances;
+
+  // Reimbursement decoding example
+  const ra =
+    await mangoV3ReimbursementClient.program.account.reimbursementAccount.fetch(
+      reimbursementAccount
+    );
+  mangoV3ReimbursementClient.reimbursed(ra, 0);
 
   // Example - reimburse for first token
   sig = await mangoV3ReimbursementClient.program.methods
