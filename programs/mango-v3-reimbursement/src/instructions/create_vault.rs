@@ -26,15 +26,7 @@ pub struct CreateVault<'info> {
         associated_token::authority = group,
     )]
     pub vault: Account<'info, TokenAccount>,
-    pub mint: Account<'info, Mint>,
 
-    #[account(
-        init_if_needed,
-        associated_token::mint = claim_mint,
-        payer = payer,
-        associated_token::authority = group.load()?.claim_transfer_destination,
-    )]
-    pub claim_mint_token_account: Box<Account<'info, TokenAccount>>,
     #[account(
         init,
         seeds = [b"Mint".as_ref(), group.key().as_ref(), &token_index.to_le_bytes()],
@@ -44,6 +36,8 @@ pub struct CreateVault<'info> {
         payer = payer
     )]
     pub claim_mint: Account<'info, Mint>,
+
+    pub mint: Account<'info, Mint>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
