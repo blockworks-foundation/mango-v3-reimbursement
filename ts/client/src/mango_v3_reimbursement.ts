@@ -25,6 +25,11 @@ export type MangoV3Reimbursement = {
           }
         },
         {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -35,17 +40,7 @@ export type MangoV3Reimbursement = {
           "isSigner": true
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -56,12 +51,12 @@ export type MangoV3Reimbursement = {
           "type": "u32"
         },
         {
-          "name": "table",
+          "name": "claimTransferDestination",
           "type": "publicKey"
         },
         {
-          "name": "claimTransferDestination",
-          "type": "publicKey"
+          "name": "testing",
+          "type": "u8"
         }
       ]
     },
@@ -77,21 +72,6 @@ export type MangoV3Reimbursement = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -117,26 +97,7 @@ export type MangoV3Reimbursement = {
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "Vault"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "group"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "token_index"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "claimMint",
@@ -178,6 +139,11 @@ export type MangoV3Reimbursement = {
           "isSigner": false
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -192,10 +158,6 @@ export type MangoV3Reimbursement = {
         {
           "name": "tokenIndex",
           "type": "u64"
-        },
-        {
-          "name": "mintDecimals",
-          "type": "u8"
         }
       ]
     },
@@ -234,17 +196,17 @@ export type MangoV3Reimbursement = {
         {
           "name": "mangoAccountOwner",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -271,21 +233,6 @@ export type MangoV3Reimbursement = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -304,11 +251,6 @@ export type MangoV3Reimbursement = {
           "isSigner": false
         },
         {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false
@@ -316,10 +258,34 @@ export type MangoV3Reimbursement = {
         {
           "name": "reimbursementAccount",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "ReimbursementAccount"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mango_account_owner"
+              }
+            ]
+          }
         },
         {
           "name": "mangoAccountOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
           "isMut": false,
           "isSigner": true
         },
@@ -428,11 +394,15 @@ export type MangoV3Reimbursement = {
             "type": "u8"
           },
           {
+            "name": "testing",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2
+                1
               ]
             }
           }
@@ -458,25 +428,6 @@ export type MangoV3Reimbursement = {
               "array": [
                 "u8",
                 4
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "table",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rows",
-            "type": {
-              "array": [
-                {
-                  "defined": "Row"
-                },
-                1
               ]
             }
           }
@@ -542,6 +493,11 @@ export const IDL: MangoV3Reimbursement = {
           }
         },
         {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "payer",
           "isMut": true,
           "isSigner": true
@@ -552,17 +508,7 @@ export const IDL: MangoV3Reimbursement = {
           "isSigner": true
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -573,12 +519,12 @@ export const IDL: MangoV3Reimbursement = {
           "type": "u32"
         },
         {
-          "name": "table",
+          "name": "claimTransferDestination",
           "type": "publicKey"
         },
         {
-          "name": "claimTransferDestination",
-          "type": "publicKey"
+          "name": "testing",
+          "type": "u8"
         }
       ]
     },
@@ -594,21 +540,6 @@ export const IDL: MangoV3Reimbursement = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -634,26 +565,7 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "Vault"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "path": "group"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "token_index"
-              }
-            ]
-          }
+          "isSigner": false
         },
         {
           "name": "claimMint",
@@ -695,6 +607,11 @@ export const IDL: MangoV3Reimbursement = {
           "isSigner": false
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -709,10 +626,6 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "tokenIndex",
           "type": "u64"
-        },
-        {
-          "name": "mintDecimals",
-          "type": "u8"
         }
       ]
     },
@@ -751,17 +664,17 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "mangoAccountOwner",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -788,21 +701,6 @@ export const IDL: MangoV3Reimbursement = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -821,11 +719,6 @@ export const IDL: MangoV3Reimbursement = {
           "isSigner": false
         },
         {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false
@@ -833,10 +726,34 @@ export const IDL: MangoV3Reimbursement = {
         {
           "name": "reimbursementAccount",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "ReimbursementAccount"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "group"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "mango_account_owner"
+              }
+            ]
+          }
         },
         {
           "name": "mangoAccountOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
           "isMut": false,
           "isSigner": true
         },
@@ -945,11 +862,15 @@ export const IDL: MangoV3Reimbursement = {
             "type": "u8"
           },
           {
+            "name": "testing",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2
+                1
               ]
             }
           }
@@ -975,25 +896,6 @@ export const IDL: MangoV3Reimbursement = {
               "array": [
                 "u8",
                 4
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "table",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rows",
-            "type": {
-              "array": [
-                {
-                  "defined": "Row"
-                },
-                1
               ]
             }
           }

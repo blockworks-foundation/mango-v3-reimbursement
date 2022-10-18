@@ -32,6 +32,7 @@ pub struct Reimburse<'info> {
         constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index)
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
+    /// CHECK: address is part of the ReimbursementAccount PDA
     pub mango_account_owner: UncheckedAccount<'info>,
 
     #[account (

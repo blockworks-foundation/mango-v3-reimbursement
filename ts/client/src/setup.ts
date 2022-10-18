@@ -92,17 +92,18 @@ async function main() {
     const sig = await mangoV3ReimbursementClient.program.methods
       .createGroup(
         GROUP_NUM,
-        new PublicKey("tab26VnfeLLkhVUa87mt5EWHA5PAbrVL1NCuSvZUSvc"),
-        new PublicKey("mdcXrm2NkzXYvHNcKXzCLXT58R4UN8Rzd1uzD4h8338")
+        new PublicKey("mdcXrm2NkzXYvHNcKXzCLXT58R4UN8Rzd1uzD4h8338"),
+        1
       )
       .accounts({
+        table: new PublicKey("tab26VnfeLLkhVUa87mt5EWHA5PAbrVL1NCuSvZUSvc"),
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
         authority: (
           mangoV3ReimbursementClient.program.provider as AnchorProvider
         ).wallet.publicKey,
       })
-      .rpc();
+      .rpc({ skipPreflight: true });
     console.log(
       `created group, sig https://explorer.solana.com/tx/${
         sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
@@ -148,7 +149,7 @@ async function main() {
     }
     const mint = await getMint(connection, tokenInfo.mint);
     const sig = await mangoV3ReimbursementClient.program.methods
-      .createVault(new BN(index), mint.decimals)
+      .createVault(new BN(index))
       .accounts({
         group: (group as any).publicKey,
         mint: tokenInfo.mint,
@@ -232,7 +233,6 @@ async function main() {
         group?.account.mints[0]!,
         admin.publicKey
       ),
-      mint: group?.account.mints[0],
       reimbursementAccount,
       claimMint: group?.account.claimMints[0],
       claimMintTokenAccount: await getAssociatedTokenAddress(

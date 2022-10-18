@@ -15,6 +15,7 @@ pub struct CreateReimbursementAccount<'info> {
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
 
+    /// CHECK: address is part of the ReimbursementAccount PDA
     pub mango_account_owner: UncheckedAccount<'info>,
 
     #[account (

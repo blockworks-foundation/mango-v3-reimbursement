@@ -17,9 +17,10 @@ pub struct CreateGroup<'info> {
     )]
     pub group: AccountLoader<'info, Group>,
 
+    /// CHECK: verification in handler
     pub table: UncheckedAccount<'info>,
 
-#[account(mut)]
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     pub authority: Signer<'info>,
