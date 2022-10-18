@@ -76,8 +76,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     require_eq!((data.len() - 40) % size_of::<Row>(), 0);
     let start = 40 + index_into_table * size_of::<Row>();
     let end = start + size_of::<Row>();
-    let row: &Row =
-        bytemuck::from_bytes::<Row>(&data[40 + index_into_table * size_of::<Row>()..end]);
+    let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
     require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
 
     token::transfer(
