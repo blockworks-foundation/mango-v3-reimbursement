@@ -1,7 +1,10 @@
 {
   "name": "@blockworks-foundation/mango-v3-reimbursement-lib",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
