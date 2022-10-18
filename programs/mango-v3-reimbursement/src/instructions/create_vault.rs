@@ -13,6 +13,7 @@ pub struct CreateVault<'info> {
     #[account (
         mut,
         has_one = authority,
+        has_one = claim_transfer_destination,
         constraint = !group.load()?.has_reimbursement_started()
     )]
     pub group: AccountLoader<'info, Group>,
@@ -27,6 +28,11 @@ pub struct CreateVault<'info> {
     )]
     pub vault: Account<'info, TokenAccount>,
 
+    #[account(mut)]
+    /// CHECK: ATA program will verify this
+    pub claim_transfer_token_account: UncheckedAccount<'info>,
+    /// CHECK: verified with a has_one on group
+    pub claim_transfer_destination: UncheckedAccount<'info>,
     #[account(
         init,
         seeds = [b"Mint".as_ref(), group.key().as_ref(), &token_index.to_le_bytes()],
@@ -49,6 +55,21 @@ pub struct CreateVault<'info> {
 }
 
 pub fn handle_create_vault(ctx: Context<CreateVault>, token_index: usize) -> Result<()> {
+    // Create claim transfer token account manually to guarantee that it is created
+    // after its mint
+    let cpi_program = ctx.accounts.associated_token_program.to_account_info();
+    let cpi_accounts = anchor_spl::associated_token::Create {
+        payer: ctx.accounts.payer.to_account_info(),
+        associated_token: ctx.accounts.claim_transfer_token_account.to_account_info(),
+        authority: ctx.accounts.claim_transfer_destination.to_account_info(),
+        mint: ctx.accounts.claim_mint.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+        rent: ctx.accounts.rent.to_account_info(),
+    };
+    let cpi_ctx = anchor_lang::context::CpiContext::new(cpi_program, cpi_accounts);
+    anchor_spl::associated_token::create(cpi_ctx)?;
+
     require!(token_index < 16usize, Error::SomeError);
 
     let mut group = ctx.accounts.group.load_mut()?;

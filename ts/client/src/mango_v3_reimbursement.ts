@@ -124,6 +124,16 @@ export type MangoV3Reimbursement = {
           }
         },
         {
+          "name": "claimTransferTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTransferDestination",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "mint",
           "isMut": false,
           "isSigner": false
@@ -590,6 +600,16 @@ export const IDL: MangoV3Reimbursement = {
               }
             ]
           }
+        },
+        {
+          "name": "claimTransferTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTransferDestination",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "mint",

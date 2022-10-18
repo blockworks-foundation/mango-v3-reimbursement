@@ -147,7 +147,18 @@ async function main() {
     if (!group?.account.vaults[index].equals(PublicKey.default)) {
       continue;
     }
-    const mint = await getMint(connection, tokenInfo.mint);
+    let bU64 = Buffer.alloc(8);
+    bU64.writeBigUInt64LE(BigInt(index));
+    const claimMint = (
+      await PublicKey.findProgramAddress(
+        [Buffer.from("Mint"), group?.publicKey.toBuffer()!, bU64],
+        mangoV3ReimbursementClient.program.programId
+      )
+    )[0];
+    const claimTransferTokenAccount = await getAssociatedTokenAddress(
+      claimMint,
+      group.account.claimTransferDestination
+    );
     const sig = await mangoV3ReimbursementClient.program.methods
       .createVault(new BN(index))
       .accounts({
@@ -158,6 +169,8 @@ async function main() {
         ),
         group: (group as any).publicKey,
         mint: tokenInfo.mint,
+        claimTransferTokenAccount,
+        claimTransferDestination: group.account.claimTransferDestination,
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
       })
