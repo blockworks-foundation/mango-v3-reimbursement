@@ -321,7 +321,7 @@ async function main() {
         throw new Error("Token not found!");
       }
       sig = await mangoV3ReimbursementClient.program.methods
-        .reimburse(0, i, true)
+        .reimburse(new BN(0), new BN(i), true)
         .accounts({
           group: (group as any).publicKey,
           vault: group?.account.vaults[i],
