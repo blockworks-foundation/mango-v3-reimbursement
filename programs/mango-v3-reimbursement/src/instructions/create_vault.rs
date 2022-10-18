@@ -13,6 +13,7 @@ pub struct CreateVault<'info> {
     #[account (
         mut,
         has_one = authority,
+        has_one = claim_transfer_destination,
         constraint = !group.load()?.has_reimbursement_started()
     )]
     pub group: AccountLoader<'info, Group>,
@@ -22,19 +23,15 @@ pub struct CreateVault<'info> {
     #[account(
         init,
         associated_token::mint = mint,
-        payer = payer,
         associated_token::authority = group,
+        payer = payer,
     )]
     pub vault: Account<'info, TokenAccount>,
     pub mint: Account<'info, Mint>,
 
-    #[account(
-        init_if_needed,
-        associated_token::mint = claim_mint,
-        payer = payer,
-        associated_token::authority = group.load()?.claim_transfer_destination,
-    )]
-    pub claim_mint_token_account: Box<Account<'info, TokenAccount>>,
+    /// CHECK: group.claim_transfer_destination
+    pub claim_transfer_destination: UncheckedAccount<'info>,
+
     #[account(
         init,
         seeds = [b"Mint".as_ref(), group.key().as_ref(), &token_index.to_le_bytes()],
@@ -44,6 +41,14 @@ pub struct CreateVault<'info> {
         payer = payer
     )]
     pub claim_mint: Account<'info, Mint>,
+
+    #[account(
+        init,
+        associated_token::mint = mint,
+        associated_token::authority = claim_transfer_destination,
+        payer = payer,
+    )]
+    pub claim_mint_token_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
