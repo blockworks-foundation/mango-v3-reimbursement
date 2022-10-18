@@ -124,7 +124,7 @@ async function main() {
   //   })
   //   .rpc();
 
-  // Reload table
+  // Reload group
   group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
     (group) => group.account.groupNum === GROUP_NUM
   );
@@ -181,6 +181,11 @@ async function main() {
       }`
     );
   }
+
+  // Reload group
+  group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
+    (group) => group.account.groupNum === GROUP_NUM
+  );
 
   // Set start reimbursement flag to true
   if (group?.account.reimbursementStarted === 0) {
@@ -260,19 +265,6 @@ async function main() {
       mangoAccountOwner: admin.publicKey,
       table: group?.account.table,
     })
-    .preInstructions([
-      await createAssociatedTokenAccountIdempotentInstruction(
-        (mangoV3ReimbursementClient.program.provider as AnchorProvider).wallet
-          .publicKey,
-        group?.account.claimTransferDestination!,
-        group?.account.claimMints[0]!,
-        await getAssociatedTokenAddress(
-          group?.account.claimMints[0]!,
-          group?.account.claimTransferDestination!,
-          true
-        )
-      ),
-    ])
     .rpc({ skipPreflight: true });
   console.log(
     `reimbursing ${admin.publicKey}, sig https://explorer.solana.com/tx/${

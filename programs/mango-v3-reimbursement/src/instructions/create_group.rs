@@ -57,7 +57,7 @@ pub fn handle_create_group(
         group.is_testing(),
         group_num,
         ctx.accounts.table.key(),
-        (data.len() - 40) / size_of::<Row>() + 1,
+        (data.len() - 40) / size_of::<Row>(),
         claim_transfer_destination
     );
 

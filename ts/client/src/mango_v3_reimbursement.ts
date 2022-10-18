@@ -100,6 +100,16 @@ export type MangoV3Reimbursement = {
           "isSigner": false
         },
         {
+          "name": "claimTransferTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTransferDestination",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "claimMint",
           "isMut": true,
           "isSigner": false,
@@ -122,16 +132,6 @@ export type MangoV3Reimbursement = {
               }
             ]
           }
-        },
-        {
-          "name": "claimTransferTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "claimTransferDestination",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "mint",
@@ -578,6 +578,16 @@ export const IDL: MangoV3Reimbursement = {
           "isSigner": false
         },
         {
+          "name": "claimTransferTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimTransferDestination",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "claimMint",
           "isMut": true,
           "isSigner": false,
@@ -600,16 +610,6 @@ export const IDL: MangoV3Reimbursement = {
               }
             ]
           }
-        },
-        {
-          "name": "claimTransferTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "claimTransferDestination",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "mint",
