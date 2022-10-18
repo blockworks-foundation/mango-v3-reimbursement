@@ -35,8 +35,6 @@ export class MangoV3ReimbursementClient {
   }
 
   public calimTransferred(reimbursementAccount, tokenIndex): boolean {
-    return (reimbursementAccount.calimTransferred & (1 << tokenIndex)) === 0
-      ? false
-      : true;
+    return (reimbursementAccount.calimTransferred & (1 << tokenIndex)) !== 0;
   }
 }
