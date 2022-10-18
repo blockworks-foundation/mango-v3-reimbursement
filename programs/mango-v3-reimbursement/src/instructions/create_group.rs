@@ -53,7 +53,8 @@ pub fn handle_create_group(
     require_eq!((data.len() - 40) % size_of::<Row>(), 0);
 
     msg!(
-        "Creating group {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
+        "Creating group (testing = {:?}) {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
+        group.is_testing(),
         group_num,
         ctx.accounts.table.key(),
         (data.len() - 40) / size_of::<Row>() + 1,
