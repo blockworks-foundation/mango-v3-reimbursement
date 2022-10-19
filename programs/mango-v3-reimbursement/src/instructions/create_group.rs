@@ -1,5 +1,3 @@
-use std::mem::size_of;
-
 use anchor_lang::prelude::*;
 
 use crate::state::{Group, Row};
@@ -42,22 +40,30 @@ pub fn handle_create_group(
     group.bump = *ctx.bumps.get("group").ok_or(Error::SomeError)?;
     group.testing = testing;
 
-    // Sanity checks on table
+    // Check authority on table
     let table_ai = &ctx.accounts.table;
     let data = table_ai.try_borrow_data()?;
     if !group.is_testing() {
         require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
     }
-    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
 
+    // Some debug logging
+    let num_of_rows = Row::get_num_of_rows(&ctx.accounts.table.try_borrow_data()?)?;
     msg!(
-        "Creating group (testing = {:?}) {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
+        "Created group (testing = {:?}) {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
         group.is_testing(),
         group_num,
         ctx.accounts.table.key(),
-        (data.len() - 40) / size_of::<Row>(),
+        num_of_rows,
         claim_transfer_destination
     );
+    if num_of_rows > 2 {
+        for index_into_table in 0..2 {
+            let data = &ctx.accounts.table.try_borrow_data()?;
+            let row = Row::load(data, index_into_table)?;
+            msg!("Debug: Row {:?} {:?}", index_into_table, row);
+        }
+    }
 
     Ok(())
 }

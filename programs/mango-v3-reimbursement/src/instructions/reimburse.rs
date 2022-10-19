@@ -1,15 +1,14 @@
-use std::mem::size_of;
-
 use crate::state::{Group, ReimbursementAccount, Row};
 use crate::Error;
-use anchor_lang::{__private::bytemuck, prelude::*};
+use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
 #[derive(Accounts)]
 #[instruction(token_index: usize)]
 pub struct Reimburse<'info> {
     #[account (
-        constraint = group.load()?.has_reimbursement_started() @ Error::ReimbursementNotStarted
+        constraint = group.load()?.has_reimbursement_started() @ Error::ReimbursementNotStarted,
+        has_one = table
     )]
     pub group: AccountLoader<'info, Group>,
 
@@ -29,7 +28,6 @@ pub struct Reimburse<'info> {
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
         constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index) @ Error::AlreadyReimbursed,
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index) @ Error::AlreadyReimbursed
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
     /// CHECK: address is part of the ReimbursementAccount PDA
@@ -70,18 +68,24 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
 
     let group = ctx.accounts.group.load()?;
 
-    // Verify entry in reimbursement table
+    // More checks on table
     let table_ai = &ctx.accounts.table;
     let data = table_ai.try_borrow_data()?;
-    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
-    let start = 40 + index_into_table * size_of::<Row>();
-    let end = start + size_of::<Row>();
-    let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
+    if !group.is_testing() {
+        require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
+    }
+
+    // Verify entry in reimbursement table
+    let row = Row::load(&data, index_into_table)?;
     require_keys_eq!(
         row.owner,
         ctx.accounts.mango_account_owner.key(),
         Error::TableRowHasWrongOwner
     );
+
+    let amount = row.balances[token_index];
+
+    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
 
     token::transfer(
         {
@@ -98,9 +102,8 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                 ],
             ])
         },
-        row.balances[token_index],
+        amount,
     )?;
-    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
     reimbursement_account.mark_reimbursed(token_index);
 
     if transfer_claim {
@@ -119,7 +122,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                     ]],
                 )
             },
-            row.balances[token_index],
+            amount,
         )?;
         reimbursement_account.mark_claim_transferred(token_index);
     }
