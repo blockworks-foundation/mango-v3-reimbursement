@@ -3,7 +3,9 @@ use std::mem::size_of;
 use anchor_lang::{__private::bytemuck, prelude::*};
 use static_assertions::const_assert_eq;
 
-#[derive(Copy, Clone, AnchorSerialize, AnchorDeserialize)]
+pub const ROW_HEADER_SIZE: usize = 40;
+
+#[derive(Debug, Copy, Clone, AnchorSerialize, AnchorDeserialize)]
 #[repr(C)]
 pub struct Row {
     pub owner: Pubkey,

@@ -1,8 +1,9 @@
 use std::mem::size_of;
 
+use anchor_lang::__private::bytemuck;
 use anchor_lang::prelude::*;
 
-use crate::state::{Group, Row};
+use crate::state::{Group, Row, ROW_HEADER_SIZE};
 use crate::Error;
 
 #[derive(Accounts)]
@@ -48,16 +49,26 @@ pub fn handle_create_group(
     if !group.is_testing() {
         require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
     }
-    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
+    require_eq!((data.len() - ROW_HEADER_SIZE) % size_of::<Row>(), 0);
 
+    let num_of_rows = (data.len() - ROW_HEADER_SIZE) / size_of::<Row>();
     msg!(
         "Creating group (testing = {:?}) {:?} with table {:?} of {:?} rows, and claim_transfer_destination {:?}",
         group.is_testing(),
         group_num,
         ctx.accounts.table.key(),
-        (data.len() - 40) / size_of::<Row>(),
+        num_of_rows,
         claim_transfer_destination
     );
+
+    if num_of_rows > 2 {
+        for index_into_table in 0..2 {
+            let start = ROW_HEADER_SIZE + index_into_table * size_of::<Row>();
+            let end = start + size_of::<Row>();
+            let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
+            msg!("Debug: Row {:?} {:?}", index_into_table, row);
+        }
+    }
 
     Ok(())
 }

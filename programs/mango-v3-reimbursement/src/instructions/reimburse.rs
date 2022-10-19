@@ -1,6 +1,6 @@
 use std::mem::size_of;
 
-use crate::state::{Group, ReimbursementAccount, Row};
+use crate::state::{Group, ReimbursementAccount, Row, ROW_HEADER_SIZE};
 use crate::Error;
 use anchor_lang::{__private::bytemuck, prelude::*};
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
@@ -73,8 +73,8 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     // Verify entry in reimbursement table
     let table_ai = &ctx.accounts.table;
     let data = table_ai.try_borrow_data()?;
-    require_eq!((data.len() - 40) % size_of::<Row>(), 0);
-    let start = 40 + index_into_table * size_of::<Row>();
+    require_eq!((data.len() - ROW_HEADER_SIZE) % size_of::<Row>(), 0);
+    let start = ROW_HEADER_SIZE + index_into_table * size_of::<Row>();
     let end = start + size_of::<Row>();
     let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
     require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
