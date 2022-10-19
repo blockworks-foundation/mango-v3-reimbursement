@@ -169,6 +169,28 @@ async function main() {
       `index - ${i}, symbol - ${symbol} mint - ${group.account.mints[i]}, vault - ${group.account.vaults[i]}, claimMint - ${group.account.claimMints[i]}`
     );
   }
+
+  // Reload group
+  group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
+    (group) => group.account.groupNum === GROUP_NUM
+  );
+
+  if (group?.account.reimbursementStarted === 0) {
+    sig = await mangoV3ReimbursementClient.program.methods
+      .startReimbursement()
+      .accounts({
+        group: (group as any).publicKey,
+        authority: (
+          mangoV3ReimbursementClient.program.provider as AnchorProvider
+        ).wallet.publicKey,
+      })
+      .rpc();
+    console.log(
+      `start reimbursement, sig https://explorer.solana.com/tx/${
+        sig + (CLUSTER === "devnet" ? "?cluster=devnet" : "")
+      }`
+    );
+  }
 }
 
 main();
