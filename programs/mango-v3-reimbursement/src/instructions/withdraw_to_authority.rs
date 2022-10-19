@@ -19,7 +19,7 @@ pub struct WithdrawToAuthority<'info> {
 
     #[account(
         mut,
-        constraint = token_account.owner == authority.key()
+        constraint = authority_token_account.owner == authority.key()
     )]
     pub authority_token_account: Box<Account<'info, TokenAccount>>,
 

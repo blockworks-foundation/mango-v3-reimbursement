@@ -1,8 +1,6 @@
-use std::mem::size_of;
-
-use crate::state::{Group, ReimbursementAccount, Row, ROW_HEADER_SIZE};
+use crate::state::{Group, ReimbursementAccount, Row};
 use crate::Error;
-use anchor_lang::{__private::bytemuck, prelude::*};
+use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
 #[derive(Accounts)]
@@ -71,25 +69,13 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     let group = ctx.accounts.group.load()?;
 
     // Verify entry in reimbursement table
-    let table_ai = &ctx.accounts.table;
-    let data = table_ai.try_borrow_data()?;
-    require_eq!((data.len() - ROW_HEADER_SIZE) % size_of::<Row>(), 0);
-    let start = ROW_HEADER_SIZE + index_into_table * size_of::<Row>();
-    let end = start + size_of::<Row>();
-    let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
+    let data = &ctx.accounts.table.try_borrow_data()?;
+    let row = Row::load(data, index_into_table)?;
     require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
-
-    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
 
     let amount = row.balances[token_index];
 
-    if amount == 0 {
-        reimbursement_account.mark_reimbursed(token_index);
-        if transfer_claim {
-            reimbursement_account.mark_claim_transferred(token_index);
-        }
-        return Ok(());
-    }
+    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
 
     token::transfer(
         {
