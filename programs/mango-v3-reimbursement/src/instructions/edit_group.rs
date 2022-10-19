@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
 
 use crate::state::Group;
+use crate::Error;
 
 #[derive(Accounts)]
 pub struct EditGroup<'info> {
     #[account(
         mut,
         has_one = authority,
-        constraint = group.load()?.is_testing(),
+        constraint = group.load()?.is_testing() @ Error::TestingOnly,
     )]
     pub group: AccountLoader<'info, Group>,
 

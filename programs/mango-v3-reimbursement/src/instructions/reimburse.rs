@@ -9,7 +9,7 @@ use anchor_spl::token::{self, Mint, Token, TokenAccount};
 #[instruction(token_index: usize)]
 pub struct Reimburse<'info> {
     #[account (
-        constraint = group.load()?.has_reimbursement_started()
+        constraint = group.load()?.has_reimbursement_started() @ Error::ReimbursementNotStarted
     )]
     pub group: AccountLoader<'info, Group>,
 
@@ -21,22 +21,22 @@ pub struct Reimburse<'info> {
 
     #[account(
         mut,
-        constraint = token_account.owner == mango_account_owner.key()
+        constraint = token_account.owner == mango_account_owner.key() @ Error::TokenAccountNotOwnedByMangoAccountOwner
     )]
     pub token_account: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index),
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index)
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index) @ Error::AlreadyReimbursed,
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index) @ Error::AlreadyReimbursed
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
     /// CHECK: address is part of the ReimbursementAccount PDA
     pub mango_account_owner: UncheckedAccount<'info>,
 
     #[account (
-        constraint = signer.key() == mango_account_owner.key() || signer.key() == group.load()?.authority
+        constraint = signer.key() == mango_account_owner.key() || signer.key() == group.load()?.authority @ Error::BadSigner
     )]
     pub signer: Signer<'info>,
 
@@ -77,7 +77,11 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     let start = 40 + index_into_table * size_of::<Row>();
     let end = start + size_of::<Row>();
     let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
-    require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
+    require_keys_eq!(
+        row.owner,
+        ctx.accounts.mango_account_owner.key(),
+        Error::TableRowHasWrongOwner
+    );
 
     token::transfer(
         {
