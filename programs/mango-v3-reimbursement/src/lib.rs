@@ -64,4 +64,11 @@ pub mod mango_v3_reimbursement {
 #[error_code]
 pub enum Error {
     SomeError,
+    ReimbursementAlreadyStarted,
+    ReimbursementNotStarted,
+    TokenAccountNotOwnedByMangoAccountOwner,
+    AlreadyReimbursed,
+    BadSigner,
+    TestingOnly,
+    TableRowHasWrongOwner,
 }

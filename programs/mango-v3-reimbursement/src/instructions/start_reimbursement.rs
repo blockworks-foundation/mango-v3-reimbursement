@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
 
 use crate::state::Group;
+use crate::Error;
 
 #[derive(Accounts)]
 pub struct StartReimbursement<'info> {
     #[account(
         mut,
         has_one = authority,
-        constraint = !group.load()?.has_reimbursement_started()
+        constraint = !group.load()?.has_reimbursement_started() @ Error::ReimbursementAlreadyStarted
     )]
     pub group: AccountLoader<'info, Group>,
 

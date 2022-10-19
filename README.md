@@ -22,14 +22,14 @@ First calculate the re-imbursement from a recent solana snapshot, we used Slot 1
 - compile [PR #208 on mango-v3](https://github.com/blockworks-foundation/mango-v3/pull/208) and the following two commands to generate a csv as well as a binary buffer
 
 ```
-cargo --bin cli equity-from-snapshot \
+cargo run --bin cli equity-from-snapshot \
 --snapshot snapshot-154856403-HJj8oytGGRnbUoFdojewzBWB3FrTBaTJdx1v4g63oUWc.sqlite \
 --late-changes deposits_withdraws.tsv \
 --program mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68 \
 --group 98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue \
 --outtype csv --outfile reimbursement.csv
 
-cargo --bin cli equity-from-snapshot \
+cargo run --bin cli equity-from-snapshot \
 --snapshot snapshot-154856403-HJj8oytGGRnbUoFdojewzBWB3FrTBaTJdx1v4g63oUWc.sqlite \
 --late-changes deposits_withdraws.tsv \
 --program mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68 \
