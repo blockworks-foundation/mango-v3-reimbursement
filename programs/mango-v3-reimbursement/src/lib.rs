@@ -25,8 +25,22 @@ pub mod mango_v3_reimbursement {
         handle_edit_group(ctx, table)
     }
 
+    pub fn change_group_authority(
+        ctx: Context<ChangeGroupAuthority>,
+        new_authority: Pubkey,
+    ) -> Result<()> {
+        handle_change_group_authority(ctx, new_authority)
+    }
+
     pub fn create_vault(ctx: Context<CreateVault>, token_index: usize) -> Result<()> {
         handle_create_vault(ctx, token_index)
+    }
+
+    pub fn withdraw_to_authority<'key, 'accounts, 'remaining, 'info>(
+        ctx: Context<'key, 'accounts, 'remaining, 'info, WithdrawToAuthority<'info>>,
+        token_index: usize,
+    ) -> Result<()> {
+        handle_withdraw_to_authority(ctx, token_index)
     }
 
     pub fn create_reimbursement_account(ctx: Context<CreateReimbursementAccount>) -> Result<()> {
