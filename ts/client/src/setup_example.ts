@@ -50,32 +50,6 @@ const mangoProgramId = groupIds.mangoProgramId;
 const mangoGroupKey = groupIds.publicKey;
 const mangoV3Client = new MangoClient(connection, mangoProgramId);
 
-Error.stackTraceLimit = 1000;
-
-export async function createAssociatedTokenAccountIdempotentInstruction(
-  payer: PublicKey,
-  owner: PublicKey,
-  mint: PublicKey,
-  ata: PublicKey
-): Promise<TransactionInstruction> {
-  return new TransactionInstruction({
-    keys: [
-      { pubkey: payer, isSigner: true, isWritable: true },
-      { pubkey: ata, isSigner: false, isWritable: true },
-      { pubkey: owner, isSigner: false, isWritable: false },
-      { pubkey: mint, isSigner: false, isWritable: false },
-      {
-        pubkey: SystemProgram.programId,
-        isSigner: false,
-        isWritable: false,
-      },
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-    ],
-    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
-    data: Buffer.from([0x1]),
-  });
-}
-
 async function main() {
   // Client setup
   let sig;
