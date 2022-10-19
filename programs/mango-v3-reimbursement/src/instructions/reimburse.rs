@@ -79,6 +79,18 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     let row: &Row = bytemuck::from_bytes::<Row>(&data[start..end]);
     require_keys_eq!(row.owner, ctx.accounts.mango_account_owner.key());
 
+    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
+
+    let amount = row.balances[token_index];
+
+    if amount == 0 {
+        reimbursement_account.mark_reimbursed(token_index);
+        if transfer_claim {
+            reimbursement_account.mark_claim_transferred(token_index);
+        }
+        return Ok(());
+    }
+
     token::transfer(
         {
             let accounts = token::Transfer {
@@ -94,9 +106,8 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                 ],
             ])
         },
-        row.balances[token_index],
+        amount,
     )?;
-    let mut reimbursement_account = ctx.accounts.reimbursement_account.load_mut()?;
     reimbursement_account.mark_reimbursed(token_index);
 
     if transfer_claim {
@@ -115,7 +126,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
                     ]],
                 )
             },
-            row.balances[token_index],
+            amount,
         )?;
         reimbursement_account.mark_claim_transferred(token_index);
     }
