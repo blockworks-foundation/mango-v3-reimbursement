@@ -17,8 +17,8 @@ default = []
 test-bpf = []
 
 [dependencies]
-anchor-lang = { path = "../../../mango-v4/anchor/lang", features = ["init-if-needed"] }
-anchor-spl = { path = "../../../mango-v4/anchor/spl" }
+anchor-lang = { version = "0.25.0", features = ["init-if-needed"] }
+anchor-spl = { version = "0.25.0" }
 solana-program = "~1.10.29"
 static_assertions = "1.1"
 
