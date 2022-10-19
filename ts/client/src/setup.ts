@@ -190,6 +190,11 @@ async function main() {
     );
   }
 
+  // Reload group
+  group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
+    (group) => group.account.groupNum === GROUP_NUM
+  );
+
   // Top up vaults
   groupIds?.tokens
     .filter(

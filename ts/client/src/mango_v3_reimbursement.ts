@@ -529,6 +529,34 @@ export type MangoV3Reimbursement = {
     {
       "code": 6000,
       "name": "SomeError"
+    },
+    {
+      "code": 6001,
+      "name": "ReimbursementAlreadyStarted"
+    },
+    {
+      "code": 6002,
+      "name": "ReimbursementNotStarted"
+    },
+    {
+      "code": 6003,
+      "name": "TokenAccountNotOwnedByMangoAccountOwner"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyReimbursed"
+    },
+    {
+      "code": 6005,
+      "name": "BadSigner"
+    },
+    {
+      "code": 6006,
+      "name": "TestingOnly"
+    },
+    {
+      "code": 6007,
+      "name": "TableRowHasWrongOwner"
     }
   ]
 };
@@ -1064,6 +1092,34 @@ export const IDL: MangoV3Reimbursement = {
     {
       "code": 6000,
       "name": "SomeError"
+    },
+    {
+      "code": 6001,
+      "name": "ReimbursementAlreadyStarted"
+    },
+    {
+      "code": 6002,
+      "name": "ReimbursementNotStarted"
+    },
+    {
+      "code": 6003,
+      "name": "TokenAccountNotOwnedByMangoAccountOwner"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyReimbursed"
+    },
+    {
+      "code": 6005,
+      "name": "BadSigner"
+    },
+    {
+      "code": 6006,
+      "name": "TestingOnly"
+    },
+    {
+      "code": 6007,
+      "name": "TableRowHasWrongOwner"
     }
   ]
 };
