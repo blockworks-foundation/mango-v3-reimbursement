@@ -65,6 +65,7 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     transfer_claim: bool,
 ) -> Result<()> {
     require!(token_index < 16usize, Error::SomeError);
+    require!(transfer_claim, Error::MustTransferClaim);
 
     let group = ctx.accounts.group.load()?;
 
