@@ -27,7 +27,7 @@ import fs from "fs";
 /// Env
 const CLUSTER_URL = process.env.MB_CLUSTER_URL;
 const PAYER_KEYPAIR = process.env.MB_PAYER_KEYPAIR;
-const GROUP_NUM = Number(process.env.GROUP_NUM || 0);
+const GROUP_NUM = Number(process.env.GROUP_NUM || 1);
 const CLUSTER: any = "mainnet-beta";
 const MANGO_V3_CLUSTER: Cluster = "mainnet";
 const MANGO_V3_GROUP_NAME: any = "mainnet.1";
@@ -64,7 +64,7 @@ async function main() {
     const sig = await mangoV3ReimbursementClient.program.methods
       .createGroup(
         GROUP_NUM,
-        new PublicKey("8SSLjXBEVk9nesbhi9UMCA32uijbVBUqWoKPPQPTekzt"),
+        new PublicKey("E3ZucWEddfWaDYUXVQbJYRYD9oNHUsWNkFVW73Y2by52"),
         0
       )
       .accounts({
