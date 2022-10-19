@@ -7,7 +7,8 @@ use anchor_spl::token::{self, Mint, Token, TokenAccount};
 #[instruction(token_index: usize)]
 pub struct Reimburse<'info> {
     #[account (
-        constraint = group.load()?.has_reimbursement_started()
+        constraint = group.load()?.has_reimbursement_started(),
+        has_one = table
     )]
     pub group: AccountLoader<'info, Group>,
 
@@ -67,6 +68,13 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     require!(token_index < 16usize, Error::SomeError);
 
     let group = ctx.accounts.group.load()?;
+
+    // More checks on table
+    let table_ai = &ctx.accounts.table;
+    let data = table_ai.try_borrow_data()?;
+    if !group.is_testing() {
+        require_keys_eq!(Pubkey::new(&data[5..37]), group.authority);
+    }
 
     // Verify entry in reimbursement table
     let data = &ctx.accounts.table.try_borrow_data()?;
