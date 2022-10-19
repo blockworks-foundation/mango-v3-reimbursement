@@ -27,8 +27,7 @@ pub struct Reimburse<'info> {
         mut,
         seeds = [b"ReimbursementAccount".as_ref(), group.key().as_ref(), mango_account_owner.key().as_ref()],
         bump,
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index),
-        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.claim_transferred(token_index)
+        constraint = group.load()?.is_testing() || !reimbursement_account.load()?.reimbursed(token_index)
     )]
     pub reimbursement_account: AccountLoader<'info, ReimbursementAccount>,
     /// CHECK: address is part of the ReimbursementAccount PDA
