@@ -233,7 +233,8 @@ async fn test_basic() -> Result<()> {
     .await
     .is_err());
 
-    send_tx(
+    // Cannot transfer_claim: false
+    assert!(send_tx(
         solana,
         ReimburseInstruction {
             group,
@@ -242,22 +243,12 @@ async fn test_basic() -> Result<()> {
             mango_account_owner: user1,
             transfer_claim: false,
             token_account: user1_token[0],
-        },
+        }
     )
     .await
-    .unwrap();
+    .is_err());
 
-    assert_eq!(solana.token_account_balance(user1_token[0]).await, 100);
-    assert_eq!(solana.token_account_balance(claim_accounts[0]).await, 0);
-    {
-        let (reimb, transf) = load_reimbursement(solana, reimbursement_account).await;
-        assert_eq!(reimb[0], true);
-        assert_eq!(reimb[1..], [false; 15]);
-        assert_eq!(transf, [false; 16]);
-    }
-
-    // does not work again (regardless of transfer_claim)
-    assert!(send_tx(
+    send_tx(
         solana,
         ReimburseInstruction {
             group,
@@ -266,10 +257,21 @@ async fn test_basic() -> Result<()> {
             mango_account_owner: user1,
             transfer_claim: true,
             token_account: user1_token[0],
-        }
+        },
     )
     .await
-    .is_err());
+    .unwrap();
+
+    assert_eq!(solana.token_account_balance(user1_token[0]).await, 100);
+    assert_eq!(solana.token_account_balance(claim_accounts[0]).await, 100);
+    {
+        let (reimb, transf) = load_reimbursement(solana, reimbursement_account).await;
+        assert_eq!(reimb[0], true);
+        assert_eq!(reimb[1..], [false; 15]);
+        assert_eq!(transf, reimb);
+    }
+
+    // does not work again
     assert!(send_tx(
         solana,
         ReimburseInstruction {
@@ -277,7 +279,7 @@ async fn test_basic() -> Result<()> {
             token_index: 0,
             table_index: 0,
             mango_account_owner: user1,
-            transfer_claim: false,
+            transfer_claim: true,
             token_account: user1_token[0],
         }
     )
@@ -305,8 +307,7 @@ async fn test_basic() -> Result<()> {
         let (reimb, transf) = load_reimbursement(solana, reimbursement_account).await;
         assert_eq!(reimb[0..2], [true; 2]);
         assert_eq!(reimb[2..], [false; 14]);
-        assert_eq!(transf[0..2], [false, true]);
-        assert_eq!(transf[2..], [false; 14]);
+        assert_eq!(transf, reimb);
     }
 
     // can't claim again
@@ -317,7 +318,7 @@ async fn test_basic() -> Result<()> {
             token_index: 1,
             table_index: 0,
             mango_account_owner: user1,
-            transfer_claim: false,
+            transfer_claim: true,
             token_account: user1_token[1],
         }
     )
@@ -373,13 +374,15 @@ async fn test_basic() -> Result<()> {
 
     assert_eq!(solana.token_account_balance(user2_token[0]).await, 0);
     assert_eq!(solana.token_account_balance(user2_token[1]).await, 1);
-    assert_eq!(solana.token_account_balance(claim_accounts[1]).await, 101 + 1);
+    assert_eq!(
+        solana.token_account_balance(claim_accounts[1]).await,
+        101 + 1
+    );
     {
         let (reimb, transf) = load_reimbursement(solana, reimbursement_account).await;
         assert_eq!(reimb[0..2], [true; 2]);
         assert_eq!(reimb[2..], [false; 14]);
-        assert_eq!(transf[0..2], [true; 2]);
-        assert_eq!(transf[2..], [false; 14]);
+        assert_eq!(transf, reimb);
     }
 
     // Can claim the rightmost row entry too
@@ -393,7 +396,7 @@ async fn test_basic() -> Result<()> {
             token_index: 15,
             table_index: 1,
             mango_account_owner: user2,
-            transfer_claim: false,
+            transfer_claim: true,
             token_account: user2_token15,
         },
     )
@@ -401,14 +404,13 @@ async fn test_basic() -> Result<()> {
     .unwrap();
 
     assert_eq!(solana.token_account_balance(user2_token15).await, 15);
-    assert_eq!(solana.token_account_balance(claim_accounts[2]).await, 0);
+    assert_eq!(solana.token_account_balance(claim_accounts[2]).await, 15);
     {
         let (reimb, transf) = load_reimbursement(solana, reimbursement_account).await;
         assert_eq!(reimb[0..2], [true; 2]);
         assert_eq!(reimb[2..15], [false; 13]);
         assert_eq!(reimb[15], true);
-        assert_eq!(transf[0..2], [true; 2]);
-        assert_eq!(transf[2..], [false; 14]);
+        assert_eq!(transf, reimb);
     }
 
     Ok(())

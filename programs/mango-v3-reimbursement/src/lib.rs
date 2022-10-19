@@ -71,4 +71,5 @@ pub enum Error {
     BadSigner,
     TestingOnly,
     TableRowHasWrongOwner,
+    MustTransferClaim,
 }
