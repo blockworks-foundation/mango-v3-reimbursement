@@ -1,7 +1,7 @@
 {
   "name": "@blockworks-foundation/mango-v3-reimbursement-lib",
   "license": "MIT",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "files": [
     "dist/**/*"
   ],
