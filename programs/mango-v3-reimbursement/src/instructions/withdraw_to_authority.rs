@@ -21,7 +21,7 @@ pub struct WithdrawToAuthority<'info> {
         mut,
         constraint = token_account.owner == authority.key()
     )]
-    pub token_account: Box<Account<'info, TokenAccount>>,
+    pub authority_token_account: Box<Account<'info, TokenAccount>>,
 
     pub authority: Signer<'info>,
 
@@ -40,7 +40,7 @@ pub fn handle_withdraw_to_authority<'key, 'accounts, 'remaining, 'info>(
         {
             let accounts = token::Transfer {
                 from: ctx.accounts.vault.to_account_info(),
-                to: ctx.accounts.token_account.to_account_info(),
+                to: ctx.accounts.authority_token_account.to_account_info(),
                 authority: ctx.accounts.group.to_account_info(),
             };
             CpiContext::new(ctx.accounts.token_program.to_account_info(), accounts).with_signer(&[
