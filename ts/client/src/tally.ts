@@ -208,7 +208,9 @@ async function main() {
   combinedNotification = combinedNotification + "```";
   console.log(combinedNotification);
 
-  // axios.post(process.env.WEBHOOK_URL, { content: combinedNotification });
+  if (process.env.WEBHOOK_URL) {
+    axios.post(process.env.WEBHOOK_URL, { content: combinedNotification });
+  }
 }
 
 main();
