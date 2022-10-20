@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, spl_token};
 use solana_program::instruction::Instruction;
 
-pub const REIMBURSE_OPCODE: u64 = 0x6f91dd5910a34ca5;
+pub const REIMBURSE_OPCODE: u64 = 0xa05c7dbb20b37258;
 
 
 #[derive(Accounts)]
@@ -171,7 +171,7 @@ pub fn reimburse(
     transfer_claim: bool,
 ) -> Result<Instruction> {
     let accounts = vec![
-        AccountMeta::new(*group_pk, false),
+        AccountMeta::new_readonly(*group_pk, false),
         AccountMeta::new(*vault_pk, false),
         AccountMeta::new(*token_account_pk, false),
         AccountMeta::new(*reimbursement_account_pk, false),

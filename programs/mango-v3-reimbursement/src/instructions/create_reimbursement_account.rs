@@ -42,7 +42,7 @@ pub fn create_reimbursement_account(
     payer_pk: &Pubkey,
 ) -> Result<Instruction> {
     let accounts = vec![
-        AccountMeta::new(*group_pk, false),
+        AccountMeta::new_readonly(*group_pk, false),
         AccountMeta::new(*reimbursement_account_pk, false),
         AccountMeta::new_readonly(*mango_account_owner_pk, false),
         AccountMeta::new(*payer_pk, true),
