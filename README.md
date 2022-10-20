@@ -6,8 +6,8 @@ Flow
 - Token Transfer to vaults outside the context of the program
 - UI creates Reimbursement account
 - UI packs tx with ixs which contain
- - create token account OR a create idempotent ATA
- - reimburse to above token account OR ATA
+  - create token account OR a create idempotent ATA
+  - reimburse to above token account OR ATA
 
 # mango-v3-reimbursement
 
