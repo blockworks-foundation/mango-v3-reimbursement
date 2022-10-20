@@ -129,6 +129,12 @@ async function main() {
 
   let combinedNotification = "```" + "\n";
   combinedNotification = combinedNotification + new Date().toUTCString() + "\n";
+  combinedNotification =
+    combinedNotification +
+    `${ras.filter((ra) => ra.account.reimbursed > 0).length}/${
+      rows.length
+    } users reimbursed` +
+    `\n`;
   combinedNotification = combinedNotification + "\n";
 
   combinedNotification =
@@ -137,7 +143,8 @@ async function main() {
       15
     )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"Vault".padStart(15)}`;
+    )} ${"Vault".padStart(15)}` +
+    `\n`;
 
   for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
