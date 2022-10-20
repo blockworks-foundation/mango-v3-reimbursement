@@ -4,6 +4,7 @@ import {
   MangoClient,
 } from "@blockworks-foundation/mango-client";
 import { AnchorProvider, Provider, Wallet } from "@project-serum/anchor";
+import axios from "axios";
 import {
   Connection,
   Keypair,
@@ -126,16 +127,18 @@ async function main() {
     }
   }
 
-  console.log(new Date().toUTCString());
-  console.log();
+  let combinedNotification = "```" + "\n";
+  combinedNotification = combinedNotification + new Date().toUTCString() + "\n";
+  combinedNotification = combinedNotification + "\n";
 
-  console.log(
+  combinedNotification =
+    combinedNotification +
     `${"Token".padStart(5)} ${"Reimbursed".padStart(
       15
     )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"Vault".padStart(15)}`
-  );
+    )} ${"Vault".padStart(15)}`;
+
   for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
   ).tokens.entries()!) {
@@ -188,12 +191,17 @@ async function main() {
       .toLocaleString()
       .padStart(15);
 
-    console.log(
+    combinedNotification =
+      combinedNotification +
       `${token.symbol.padStart(
         5
-      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString}`
-    );
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString}` +
+      "\n";
   }
+  combinedNotification = combinedNotification + "```";
+  console.log(combinedNotification);
+
+  // axios.post(process.env.WEBHOOK_URL, { content: combinedNotification });
 }
 
 main();
