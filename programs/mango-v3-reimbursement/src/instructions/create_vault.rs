@@ -14,7 +14,7 @@ pub struct CreateVault<'info> {
         mut,
         has_one = authority,
         has_one = claim_transfer_destination,
-        constraint = !group.load()?.has_reimbursement_started()
+        constraint = !group.load()?.has_reimbursement_started() @ Error::ReimbursementAlreadyStarted
     )]
     pub group: AccountLoader<'info, Group>,
 

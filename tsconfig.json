@@ -1,22 +1,16 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "lib": [
-      "es2019"
-    ],
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": true,
     "outDir": "./dist",
-    "resolveJsonModule": true,
-    "noImplicitAny": false,
-    "sourceMap": true,
+    "strict": false,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "target": "es2019",
-    "strictNullChecks": true
+    "downlevelIteration": true
   },
-  "include": [
-    "ts/client/src",
-  ],
-  "exclude": [
-    "node_modules",
-  ]
+  "include": ["ts/client/src/*.ts"],
+  "exclude": ["node_modules"]
 }

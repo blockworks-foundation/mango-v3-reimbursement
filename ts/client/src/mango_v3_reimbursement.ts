@@ -82,6 +82,32 @@ export type MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "changeGroupAuthority",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newAuthority",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "createVault",
       "accounts": [
         {
@@ -172,6 +198,42 @@ export type MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "withdrawToAuthority",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorityTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenIndex",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "createReimbursementAccount",
       "accounts": [
         {
@@ -207,11 +269,6 @@ export type MangoV3Reimbursement = {
           "name": "mangoAccountOwner",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "payer",
@@ -332,11 +389,11 @@ export type MangoV3Reimbursement = {
       ],
       "args": [
         {
-          "name": "indexIntoTable",
+          "name": "tokenIndex",
           "type": "u64"
         },
         {
-          "name": "tokenIndex",
+          "name": "indexIntoTable",
           "type": "u64"
         },
         {
@@ -472,6 +529,34 @@ export type MangoV3Reimbursement = {
     {
       "code": 6000,
       "name": "SomeError"
+    },
+    {
+      "code": 6001,
+      "name": "ReimbursementAlreadyStarted"
+    },
+    {
+      "code": 6002,
+      "name": "ReimbursementNotStarted"
+    },
+    {
+      "code": 6003,
+      "name": "TokenAccountNotOwnedByMangoAccountOwner"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyReimbursed"
+    },
+    {
+      "code": 6005,
+      "name": "BadSigner"
+    },
+    {
+      "code": 6006,
+      "name": "TestingOnly"
+    },
+    {
+      "code": 6007,
+      "name": "TableRowHasWrongOwner"
     }
   ]
 };
@@ -560,6 +645,32 @@ export const IDL: MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "changeGroupAuthority",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "table",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newAuthority",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "createVault",
       "accounts": [
         {
@@ -650,6 +761,42 @@ export const IDL: MangoV3Reimbursement = {
       ]
     },
     {
+      "name": "withdrawToAuthority",
+      "accounts": [
+        {
+          "name": "group",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorityTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenIndex",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "createReimbursementAccount",
       "accounts": [
         {
@@ -685,11 +832,6 @@ export const IDL: MangoV3Reimbursement = {
           "name": "mangoAccountOwner",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "payer",
@@ -810,11 +952,11 @@ export const IDL: MangoV3Reimbursement = {
       ],
       "args": [
         {
-          "name": "indexIntoTable",
+          "name": "tokenIndex",
           "type": "u64"
         },
         {
-          "name": "tokenIndex",
+          "name": "indexIntoTable",
           "type": "u64"
         },
         {
@@ -950,6 +1092,34 @@ export const IDL: MangoV3Reimbursement = {
     {
       "code": 6000,
       "name": "SomeError"
+    },
+    {
+      "code": 6001,
+      "name": "ReimbursementAlreadyStarted"
+    },
+    {
+      "code": 6002,
+      "name": "ReimbursementNotStarted"
+    },
+    {
+      "code": 6003,
+      "name": "TokenAccountNotOwnedByMangoAccountOwner"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyReimbursed"
+    },
+    {
+      "code": 6005,
+      "name": "BadSigner"
+    },
+    {
+      "code": 6006,
+      "name": "TestingOnly"
+    },
+    {
+      "code": 6007,
+      "name": "TableRowHasWrongOwner"
     }
   ]
 };

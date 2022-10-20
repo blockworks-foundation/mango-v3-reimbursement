@@ -5,11 +5,17 @@ skip-lint = false
 [programs.localnet]
 mango_v3_reimbursement = "m3roABq4Ta3sGyFRLdY4LH1KN16zBtg586gJ3UxoBzb"
 
+[programs.devnet]
+mango_v3_reimbursement = "m3roABq4Ta3sGyFRLdY4LH1KN16zBtg586gJ3UxoBzb"
+
+[programs.mainnet]
+mango_v3_reimbursement = "m3roABq4Ta3sGyFRLdY4LH1KN16zBtg586gJ3UxoBzb"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "mainnet"
 wallet = "/Users/mc/.config/solana/id.json"
 
 [scripts]
