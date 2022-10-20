@@ -114,7 +114,7 @@ async function main() {
         continue;
       }
       // token was reimbursed
-      if (mangoV3ReimbursementClient.reimbursed(ra.account, 0)) {
+      if (mangoV3ReimbursementClient.reimbursed(ra.account, tokenIndex)) {
         reimbursed[tokenIndex] =
           reimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
       }
@@ -131,9 +131,7 @@ async function main() {
       15
     )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"Vault".padStart(15)} ${"VaultAccount".padStart(
-      15
-    )} (${new Date().toTimeString()})`
+    )} ${"Vault".padStart(15)} (${new Date().toTimeString()})`
   );
   for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
@@ -163,34 +161,34 @@ async function main() {
       )
       .supply.toNumber();
 
-    const reimbursedString = (
-      reimbursed[tokenIndex] / Math.pow(10, token.decimals)
+    const reimbursedString = parseFloat(
+      (reimbursed[tokenIndex] / Math.pow(10, token.decimals)).toFixed(5)
     )
-      .toFixed(5)
+      .toLocaleString()
       .padStart(15);
 
-    const claimMintSupplyString = (
-      claimMintSupply / Math.pow(10, token.decimals)
+    const claimMintSupplyString = parseFloat(
+      (claimMintSupply / Math.pow(10, token.decimals)).toFixed(5)
     )
-      .toFixed(5)
+      .toLocaleString()
       .padStart(15);
 
-    const toBeReimbursedString = (
-      toBeReimbursed[tokenIndex] / Math.pow(10, token.decimals)
+    const toBeReimbursedString = parseFloat(
+      (toBeReimbursed[tokenIndex] / Math.pow(10, token.decimals)).toFixed(5)
     )
-      .toFixed(5)
+      .toLocaleString()
       .padStart(15);
 
-    const vaultBalanceString = (vault / Math.pow(10, token.decimals))
-      .toFixed(5)
+    const vaultBalanceString = parseFloat(
+      (vault / Math.pow(10, token.decimals)).toFixed(5)
+    )
+      .toLocaleString()
       .padStart(15);
 
     console.log(
       `${token.symbol.padStart(
         5
-      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString} (https://explorer.solana.com/address/${
-        group.account.vaults[tokenIndex]
-      })`
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString})`
     );
   }
 }
