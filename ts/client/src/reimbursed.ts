@@ -116,9 +116,11 @@ async function main() {
   console.log(
     `${"Token".padStart(5)} ${"Reimbursed".padStart(
       15
-    )} ${"ToBeReimbursed".padStart(15)} ${"Vault".padStart(
+    )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"VaultAccount".padStart(15)} (${new Date().toTimeString()})`
+    )} ${"Vault".padStart(15)} ${"VaultAccount".padStart(
+      15
+    )} (${new Date().toTimeString()})`
   );
   for (const [i, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
@@ -139,7 +141,22 @@ async function main() {
       )
       .amount.toNumber();
 
+    const claimMintSupply = coder()
+      .accounts.decode(
+        "mint",
+        (await mangoV3ReimbursementClient.program.provider.connection.getAccountInfo(
+          group.account.claimMints[i]
+        ))!.data
+      )
+      .supply.toNumber();
+
     const reimbursedString = (reimbursed[i] / Math.pow(10, token.decimals))
+      .toFixed(5)
+      .padStart(15);
+
+    const claimMintSupplyString = (
+      claimMintSupply / Math.pow(10, token.decimals)
+    )
       .toFixed(5)
       .padStart(15);
 
@@ -156,7 +173,7 @@ async function main() {
     console.log(
       `${token.symbol.padStart(
         5
-      )} ${reimbursedString} ${toBeReimbursedString} ${vaultBalanceString} (https://explorer.solana.com/address/${
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString} (https://explorer.solana.com/address/${
         group.account.vaults[i]
       })`
     );
