@@ -56,21 +56,24 @@ async function main() {
   const provider = new AnchorProvider(connection, adminWallet, options);
   const mangoV3ReimbursementClient = new MangoV3ReimbursementClient(provider);
 
+  // load group
   let group = (
     await mangoV3ReimbursementClient.program.account.group.all()
   ).find((group) => group.account.groupNum === GROUP_NUM);
 
+  // load table
   const rows = await mangoV3ReimbursementClient.decodeTable(group.account);
 
   let reimbursed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   let toBeReimbursed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+  // load all reimbursementAccounts
   const ras =
     await mangoV3ReimbursementClient.program.account.reimbursementAccount.all();
 
   const v3group = await mangoV3Client.getMangoGroup(mangoGroupKey);
 
-  for (const [i, row] of rows.entries()) {
+  for (const [rowIndex, row] of rows.entries()) {
     const reimbursementAccount = (
       await PublicKey.findProgramAddress(
         [
@@ -82,33 +85,43 @@ async function main() {
       )
     )[0];
 
+    // find reimbursementAccount
     const ra = ras.find((entry) =>
       entry.publicKey.equals(reimbursementAccount)
     );
+
+    // if reimbursementAccount was not yet created
     if (!ra) {
-      for (const [i, tokenInfo] of v3group.tokens.entries()!) {
+      for (const [tokenIndex, tokenInfo] of v3group.tokens.entries()!) {
         const token = groupIds?.tokens.find((token) =>
           token.mintKey.equals(tokenInfo.mint)
         );
         if (!token) {
           continue;
         }
-        toBeReimbursed[i] = toBeReimbursed[i] + row.balances[i].toNumber();
+        toBeReimbursed[tokenIndex] =
+          toBeReimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
       }
       continue;
     }
 
-    for (const [i, tokenInfo] of v3group.tokens.entries()!) {
+    // tally where reimbursementAccount was created
+    for (const [tokenIndex, tokenInfo] of v3group.tokens.entries()!) {
       const token = groupIds?.tokens.find((token) =>
         token.mintKey.equals(tokenInfo.mint)
       );
       if (!token) {
         continue;
       }
+      // token was reimbursed
       if (mangoV3ReimbursementClient.reimbursed(ra.account, 0)) {
-        reimbursed[i] = reimbursed[i] + row.balances[i].toNumber();
-      } else {
-        toBeReimbursed[i] = toBeReimbursed[i] + row.balances[i].toNumber();
+        reimbursed[tokenIndex] =
+          reimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
+      }
+      // token was not reimbursed
+      else {
+        toBeReimbursed[tokenIndex] =
+          toBeReimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
       }
     }
   }
@@ -122,7 +135,7 @@ async function main() {
       15
     )} (${new Date().toTimeString()})`
   );
-  for (const [i, tokenInfo] of (
+  for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
   ).tokens.entries()!) {
     const token = groupIds?.tokens.find((token) =>
@@ -136,7 +149,7 @@ async function main() {
       .accounts.decode(
         "token",
         (await mangoV3ReimbursementClient.program.provider.connection.getAccountInfo(
-          group.account.vaults[i]
+          group.account.vaults[tokenIndex]
         ))!.data
       )
       .amount.toNumber();
@@ -145,12 +158,14 @@ async function main() {
       .accounts.decode(
         "mint",
         (await mangoV3ReimbursementClient.program.provider.connection.getAccountInfo(
-          group.account.claimMints[i]
+          group.account.claimMints[tokenIndex]
         ))!.data
       )
       .supply.toNumber();
 
-    const reimbursedString = (reimbursed[i] / Math.pow(10, token.decimals))
+    const reimbursedString = (
+      reimbursed[tokenIndex] / Math.pow(10, token.decimals)
+    )
       .toFixed(5)
       .padStart(15);
 
@@ -161,7 +176,7 @@ async function main() {
       .padStart(15);
 
     const toBeReimbursedString = (
-      toBeReimbursed[i] / Math.pow(10, token.decimals)
+      toBeReimbursed[tokenIndex] / Math.pow(10, token.decimals)
     )
       .toFixed(5)
       .padStart(15);
@@ -174,7 +189,7 @@ async function main() {
       `${token.symbol.padStart(
         5
       )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString} (https://explorer.solana.com/address/${
-        group.account.vaults[i]
+        group.account.vaults[tokenIndex]
       })`
     );
   }
