@@ -56,21 +56,24 @@ async function main() {
   const provider = new AnchorProvider(connection, adminWallet, options);
   const mangoV3ReimbursementClient = new MangoV3ReimbursementClient(provider);
 
+  // load group
   let group = (
     await mangoV3ReimbursementClient.program.account.group.all()
   ).find((group) => group.account.groupNum === GROUP_NUM);
 
+  // load table
   const rows = await mangoV3ReimbursementClient.decodeTable(group.account);
 
   let reimbursed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   let toBeReimbursed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+  // load all reimbursementAccounts
   const ras =
     await mangoV3ReimbursementClient.program.account.reimbursementAccount.all();
 
   const v3group = await mangoV3Client.getMangoGroup(mangoGroupKey);
 
-  for (const [i, row] of rows.entries()) {
+  for (const [rowIndex, row] of rows.entries()) {
     const reimbursementAccount = (
       await PublicKey.findProgramAddress(
         [
@@ -82,41 +85,58 @@ async function main() {
       )
     )[0];
 
+    // find reimbursementAccount
     const ra = ras.find((entry) =>
       entry.publicKey.equals(reimbursementAccount)
     );
+
+    // if reimbursementAccount was not yet created
     if (!ra) {
-      for (const [i, tokenInfo] of v3group.tokens.entries()!) {
+      for (const [tokenIndex, tokenInfo] of v3group.tokens.entries()!) {
         const token = groupIds?.tokens.find((token) =>
           token.mintKey.equals(tokenInfo.mint)
         );
         if (!token) {
           continue;
         }
-        toBeReimbursed[i] = toBeReimbursed[i] + row.balances[i].toNumber();
+        toBeReimbursed[tokenIndex] =
+          toBeReimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
       }
       continue;
     }
 
-    for (const [i, tokenInfo] of v3group.tokens.entries()!) {
+    // tally where reimbursementAccount was created
+    for (const [tokenIndex, tokenInfo] of v3group.tokens.entries()!) {
       const token = groupIds?.tokens.find((token) =>
         token.mintKey.equals(tokenInfo.mint)
       );
       if (!token) {
         continue;
       }
-      if (mangoV3ReimbursementClient.reimbursed(ra.account, 0)) {
-        reimbursed[i] = reimbursed[i] + row.balances[i].toNumber();
-      } else {
-        toBeReimbursed[i] = toBeReimbursed[i] + row.balances[i].toNumber();
+      // token was reimbursed
+      if (mangoV3ReimbursementClient.reimbursed(ra.account, tokenIndex)) {
+        reimbursed[tokenIndex] =
+          reimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
+      }
+      // token was not reimbursed
+      else {
+        toBeReimbursed[tokenIndex] =
+          toBeReimbursed[tokenIndex] + row.balances[tokenIndex].toNumber();
       }
     }
   }
 
+  console.log(new Date().toUTCString());
+  console.log();
+
   console.log(
-    `Reimbursed, To be Reimbursed, Current vault balance (${new Date().toTimeString()})`
+    `${"Token".padStart(5)} ${"Reimbursed".padStart(
+      15
+    )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
+      15
+    )} ${"Vault".padStart(15)}`
   );
-  for (const [i, tokenInfo] of (
+  for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
   ).tokens.entries()!) {
     const token = groupIds?.tokens.find((token) =>
@@ -130,27 +150,48 @@ async function main() {
       .accounts.decode(
         "token",
         (await mangoV3ReimbursementClient.program.provider.connection.getAccountInfo(
-          group.account.vaults[i]
+          group.account.vaults[tokenIndex]
         ))!.data
       )
       .amount.toNumber();
 
-    const reimbursedString = (reimbursed[i] / Math.pow(10, token.decimals))
-      .toFixed(5)
-      .padStart(15);
+    const claimMintSupply = coder()
+      .accounts.decode(
+        "mint",
+        (await mangoV3ReimbursementClient.program.provider.connection.getAccountInfo(
+          group.account.claimMints[tokenIndex]
+        ))!.data
+      )
+      .supply.toNumber();
 
-    const toBeReimbursedString = (
-      toBeReimbursed[i] / Math.pow(10, token.decimals)
+    const reimbursedString = parseFloat(
+      (reimbursed[tokenIndex] / Math.pow(10, token.decimals)).toFixed(5)
     )
-      .toFixed(5)
+      .toLocaleString()
       .padStart(15);
 
-    const vaultBalanceString = (vault / Math.pow(15, token.decimals))
-      .toFixed(5)
+    const claimMintSupplyString = parseFloat(
+      (claimMintSupply / Math.pow(10, token.decimals)).toFixed(5)
+    )
+      .toLocaleString()
+      .padStart(15);
+
+    const toBeReimbursedString = parseFloat(
+      (toBeReimbursed[tokenIndex] / Math.pow(10, token.decimals)).toFixed(5)
+    )
+      .toLocaleString()
+      .padStart(15);
+
+    const vaultBalanceString = parseFloat(
+      (vault / Math.pow(10, token.decimals)).toFixed(5)
+    )
+      .toLocaleString()
       .padStart(15);
 
     console.log(
-      `${token.symbol} ${reimbursedString} ${toBeReimbursedString} ${vaultBalanceString}`
+      `${token.symbol.padStart(
+        5
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString}`
     );
   }
 }
