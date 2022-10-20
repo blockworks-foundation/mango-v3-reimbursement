@@ -126,12 +126,15 @@ async function main() {
     }
   }
 
+  console.log(new Date().toUTCString());
+  console.log();
+
   console.log(
     `${"Token".padStart(5)} ${"Reimbursed".padStart(
       15
     )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"Vault".padStart(15)} (${new Date().toTimeString()})`
+    )} ${"Vault".padStart(15)}`
   );
   for (const [tokenIndex, tokenInfo] of (
     await mangoV3Client.getMangoGroup(mangoGroupKey)
@@ -188,7 +191,7 @@ async function main() {
     console.log(
       `${token.symbol.padStart(
         5
-      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString})`
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString}`
     );
   }
 }
