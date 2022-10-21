@@ -2,6 +2,7 @@ use crate::state::{Group, ReimbursementAccount, Row};
 use crate::Error;
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
+use solana_program::instruction::Instruction;
 
 #[derive(Accounts)]
 #[instruction(token_index: usize)]
@@ -149,4 +150,46 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     }
 
     Ok(())
+}
+
+// non-anchor style helper to make it easier for integrators
+pub fn reimburse_instruction(
+    group: Pubkey,
+    vault: Pubkey,
+    token_account: Pubkey,
+    reimbursement_account: Pubkey,
+    mango_account_owner: Pubkey,
+    signer: Pubkey,
+    claim_mint_token_account: Pubkey,
+    claim_mint: Pubkey,
+    table: Pubkey,
+    token_index: usize,
+    index_into_table: usize,
+    transfer_claim: bool,
+) -> Instruction {
+    Instruction {
+        program_id: crate::id(),
+        accounts: ToAccountMetas::to_account_metas(
+            &crate::accounts::Reimburse {
+                group,
+                vault,
+                token_account,
+                reimbursement_account,
+                mango_account_owner,
+                signer,
+                claim_mint_token_account,
+                claim_mint,
+                table,
+                system_program: solana_program::system_program::ID,
+                token_program: anchor_spl::token::ID,
+                rent: solana_program::sysvar::rent::ID,
+            },
+            None,
+        ),
+        data: anchor_lang::InstructionData::data(&crate::instruction::Reimburse {
+            token_index,
+            index_into_table,
+            transfer_claim,
+        }),
+    }
 }
