@@ -91,18 +91,23 @@ async function main() {
             const amount =
               parseInt((ix as any).parsed.info.amount) /
               Math.pow(10, tokens[tokenIndex].decimals);
-            const amountString = amount.toFixed(2).padStart(12);
+            const amountString = parseFloat(amount.toFixed(2))
+              .toLocaleString()
+              .padStart(12);
             const value = amount * price;
-            const valueString = value.toFixed(2).padStart(12);
+            const valueString = parseFloat(value.toFixed(2))
+              .toLocaleString()
+              .padStart(12);
 
             if (value > 50_000) {
-              const combinedNotification = `reimbursed, slot - ${
-                meta.slot
-              }, ${symbol.padStart(
-                5
-              )} amount - ${amountString}, value - ${valueString} sig https://explorer.solana.com/tx/${
-                sig.signature
-              }`;
+              let combinedNotification =
+                "```\n" +
+                `reimbursed, slot - ${meta.slot}, ${symbol.padStart(
+                  5
+                )} amount - ${amountString}, value - ${valueString} sig https://explorer.solana.com/tx/${
+                  sig.signature
+                }` +
+                "\n```";
               console.log(combinedNotification);
 
               if (process.env.WEBHOOK_URL) {
