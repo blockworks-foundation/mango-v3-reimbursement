@@ -1,7 +1,11 @@
 use crate::state::{Group, ReimbursementAccount, Row};
 use crate::Error;
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount};
+use anchor_spl::token::{self, Mint, Token, TokenAccount, spl_token};
+use solana_program::instruction::Instruction;
+
+pub const REIMBURSE_OPCODE: u64 = 0xa05c7dbb20b37258;
+
 
 #[derive(Accounts)]
 #[instruction(token_index: usize)]
@@ -149,4 +153,43 @@ pub fn handle_reimburse<'key, 'accounts, 'remaining, 'info>(
     }
 
     Ok(())
+}
+
+pub fn reimburse(
+    program_id: &Pubkey,
+    group_pk: &Pubkey,
+    vault_pk: &Pubkey,
+    token_account_pk: &Pubkey,
+    reimbursement_account_pk: &Pubkey,
+    mango_account_owner_pk: &Pubkey,
+    signer_pk: &Pubkey,
+    claim_mint_token_account_pk: &Pubkey,
+    claim_mint_pk: &Pubkey,
+    table_pk: &Pubkey,
+    token_index: usize,
+    index_into_table: usize,
+    transfer_claim: bool,
+) -> Result<Instruction> {
+    let accounts = vec![
+        AccountMeta::new_readonly(*group_pk, false),
+        AccountMeta::new(*vault_pk, false),
+        AccountMeta::new(*token_account_pk, false),
+        AccountMeta::new(*reimbursement_account_pk, false),
+        AccountMeta::new_readonly(*mango_account_owner_pk, false),
+        AccountMeta::new(*signer_pk, true),
+        AccountMeta::new(*claim_mint_token_account_pk, false),
+        AccountMeta::new(*claim_mint_pk, false),
+        AccountMeta::new_readonly(*table_pk, false),
+        AccountMeta::new_readonly(spl_token::ID, false),
+        AccountMeta::new_readonly(solana_program::system_program::ID, false),
+        AccountMeta::new_readonly(solana_program::sysvar::rent::ID, false)
+    ];
+
+    let mut ix_data = Vec::<u8>::new();
+    ix_data.extend(REIMBURSE_OPCODE.to_be_bytes().to_vec());
+    ix_data.extend_from_slice(&token_index.to_le_bytes());
+    ix_data.extend_from_slice(&index_into_table.to_le_bytes());
+    ix_data.extend_from_slice(&[transfer_claim as u8]);
+
+    Ok(Instruction { program_id: *program_id, accounts, data: ix_data })
 }
