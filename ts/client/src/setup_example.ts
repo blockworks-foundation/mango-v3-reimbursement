@@ -70,10 +70,10 @@ async function main() {
       .createGroup(
         GROUP_NUM,
         new PublicKey("mdcXrm2NkzXYvHNcKXzCLXT58R4UN8Rzd1uzD4h8338"),
-        1
+        0
       )
       .accounts({
-        table: new PublicKey("tabXVjdYVYGbT2SmZbgaaXm1QBYArbDio8BMCZxgrU4"),
+        table: new PublicKey("tab2GSQhmstsCiPmPABk1F8QnffSaFEXnqbef7AkEnB"),
         payer: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
           .wallet.publicKey,
         authority: (
@@ -90,16 +90,6 @@ async function main() {
   let group = (
     await mangoV3ReimbursementClient.program.account.group.all()
   ).find((group) => group.account.groupNum === GROUP_NUM);
-
-  // // Edit group, set new table
-  // await mangoV3ReimbursementClient.program.methods
-  //   .editGroup(new PublicKey("tabXVjdYVYGbT2SmZbgaaXm1QBYArbDio8BMCZxgrU4"))
-  //   .accounts({
-  //     group: group?.publicKey,
-  //     authority: (mangoV3ReimbursementClient.program.provider as AnchorProvider)
-  //       .wallet.publicKey,
-  //   })
-  //   .rpc();
 
   // Reload group
   group = (await mangoV3ReimbursementClient.program.account.group.all()).find(
@@ -199,7 +189,7 @@ async function main() {
           group?.account.mints[i]!,
           group?.account.vaults[i]!,
           admin.publicKey,
-          10,
+          100,
           token.decimals
         )
       );
