@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use solana_program::instruction::Instruction;
 
 use crate::state::{Group, ReimbursementAccount};
 
@@ -29,4 +30,30 @@ pub fn handle_create_reimbursement_account(
     _ctx: Context<CreateReimbursementAccount>,
 ) -> Result<()> {
     Ok(())
+}
+
+// non-anchor style helper to make it easier for integrators
+pub fn create_reimbursement_account_instruction(
+    group: Pubkey,
+    reimbursement_account: Pubkey,
+    mango_account_owner: Pubkey,
+    payer: Pubkey,
+) -> Instruction {
+    Instruction {
+        program_id: crate::id(),
+        accounts: ToAccountMetas::to_account_metas(
+            &crate::accounts::CreateReimbursementAccount {
+                group,
+                reimbursement_account,
+                mango_account_owner,
+                payer,
+                system_program: solana_program::system_program::ID,
+                rent: solana_program::sysvar::rent::ID,
+            },
+            None,
+        ),
+        data: anchor_lang::InstructionData::data(
+            &crate::instruction::CreateReimbursementAccount {},
+        ),
+    }
 }
