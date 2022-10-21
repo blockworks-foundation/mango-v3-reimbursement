@@ -52,7 +52,7 @@ async function main() {
   ).find((group) => group.account.groupNum === GROUP_NUM);
 
   let signatures;
-  let lastSeenSignature;
+  let lastSeenSignature = process.env.LAST_SIGNATURE;
   while (true) {
     signatures = await connection.getConfirmedSignaturesForAddress2(
       group.publicKey,
@@ -121,7 +121,7 @@ async function main() {
       }
     }
 
-    await sleep(20000);
+    await sleep(60000);
   }
 }
 
