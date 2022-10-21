@@ -143,7 +143,7 @@ async function main() {
       15
     )} ${"ClaimMintSupply".padStart(15)} ${"ToBeReimbursed".padStart(
       15
-    )} ${"Vault".padStart(15)}` +
+    )} ${"Reimb/ToBeReimb %".padStart(15)} ${"Vault".padStart(15)}` +
     `\n`;
 
   for (const [tokenIndex, tokenInfo] of (
@@ -192,6 +192,15 @@ async function main() {
       .toLocaleString()
       .padStart(15);
 
+    const ratioString = parseFloat(
+      (
+        (reimbursed[tokenIndex] * 100) /
+        (reimbursed[tokenIndex] + toBeReimbursed[tokenIndex])
+      ).toFixed(2)
+    )
+      .toLocaleString()
+      .padStart(15);
+
     const vaultBalanceString = parseFloat(
       (vault / Math.pow(10, token.decimals)).toFixed(5)
     )
@@ -202,7 +211,7 @@ async function main() {
       combinedNotification +
       `${token.symbol.padStart(
         5
-      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${vaultBalanceString}` +
+      )} ${reimbursedString} ${claimMintSupplyString} ${toBeReimbursedString} ${ratioString} ${vaultBalanceString}` +
       "\n";
   }
   combinedNotification = combinedNotification + "```";
